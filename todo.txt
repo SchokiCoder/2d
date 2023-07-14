@@ -1,0 +1,16 @@
+rehab:
+{
+	-finish Makefile			.
+	-fix application name labels		.
+	-fix application version labels		.
+}
+
+refactor:
+remove typedef from struct
+GNU indent messed my pointers up: "muh * ptr"
+bool -> int
+{
+	-engine						v
+	-gui						.
+	-main						.
+}

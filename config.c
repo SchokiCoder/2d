@@ -4,15 +4,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <SM_log.h>
-#include <SM_dict.h>
-#include "path.h"
 #include "config.h"
+#include "engine/dict.h"
+#include "engine/log.h"
+#include "path.h"
 
-Config Config_new(void)
+struct Config Config_new(void)
 {
-	Config cfg = {
-		.invalid = false,
+	struct Config cfg = {
+		.invalid = 0,
 		.gfx_window_x = CFG_STD_GFX_WINDOW_X,
 		.gfx_window_y = CFG_STD_GFX_WINDOW_Y,
 		.gfx_window_w = CFG_STD_GFX_WINDOW_W,
@@ -23,49 +23,49 @@ Config Config_new(void)
 	return cfg;
 }
 
-void Config_load(Config * cfg)
+void Config_load(struct Config *cfg)
 {
-	SM_String filepath = SM_String_new(16);
-	SM_String msg = SM_String_new(1);
+	struct String filepath = String_new(16);
+	struct String msg = String_new(1);
 
 	// get path
 	if (get_config_path(&filepath) != 0) {
-		SM_String_clear(&filepath);
-		cfg->invalid = true;
+		String_clear(&filepath);
+		cfg->invalid = 1;
 		return;
 	}
 	// read file
-	SM_Dict dict = SM_Dict_from_file(filepath.str);
+	struct Dict dict = Dict_from_file(filepath.str);
 
 	if (dict.invalid) {
-		SM_String_clear(&filepath);
-		cfg->invalid = true;
-		SM_log_warn("Config could not be loaded.");
+		String_clear(&filepath);
+		cfg->invalid = 1;
+		log_warn("Config could not be loaded.");
 		return;
 	}
 	// convert dict into config
 	for (size_t i = 0; i < dict.len; i++) {
 		// window pos, size
-		if (SM_strequal(dict.data[i].key.str, CFG_SETTING_GFX_WINDOW_X))
+		if (strequal(dict.data[i].key.str, CFG_SETTING_GFX_WINDOW_X))
 			cfg->gfx_window_x =
 			    strtol(dict.data[i].value.str, NULL, 10);
 
-		else if (SM_strequal
+		else if (strequal
 			 (dict.data[i].key.str, CFG_SETTING_GFX_WINDOW_Y))
 			cfg->gfx_window_y =
 			    strtol(dict.data[i].value.str, NULL, 10);
 
-		else if (SM_strequal
+		else if (strequal
 			 (dict.data[i].key.str, CFG_SETTING_GFX_WINDOW_W))
 			cfg->gfx_window_w =
 			    strtol(dict.data[i].value.str, NULL, 10);
 
-		else if (SM_strequal
+		else if (strequal
 			 (dict.data[i].key.str, CFG_SETTING_GFX_WINDOW_H))
 			cfg->gfx_window_h =
 			    strtol(dict.data[i].value.str, NULL, 10);
 
-		else if (SM_strequal
+		else if (strequal
 			 (dict.data[i].key.str,
 			  CFG_SETTING_GFX_WINDOW_FULLSCREEN))
 			cfg->gfx_window_fullscreen =
@@ -73,48 +73,48 @@ void Config_load(Config * cfg)
 
 		// unknown option
 		else {
-			SM_String_copy_cstr(&msg, "Unknown config setting \"");
-			SM_String_append(&msg, &dict.data[i].key);
-			SM_String_append_cstr(&msg, "\".");
-			SM_log_warn(msg.str);
+			String_copy_cstr(&msg, "Unknown config setting \"");
+			String_append(&msg, &dict.data[i].key);
+			String_append_cstr(&msg, "\".");
+			log_warn(msg.str);
 		}
 	}
 
-	SM_String_clear(&filepath);
-	SM_String_clear(&msg);
-	SM_Dict_clear(&dict);
+	String_clear(&filepath);
+	String_clear(&msg);
+	Dict_clear(&dict);
 }
 
-void Config_save(Config * cfg)
+void Config_save(struct Config *cfg)
 {
-	SM_String filepath = SM_String_new(16);
+	struct String filepath = String_new(16);
 
 	/* get path */
 	if (get_config_path(&filepath) != 0) {
-		SM_String_clear(&filepath);
-		cfg->invalid = true;
+		String_clear(&filepath);
+		cfg->invalid = 1;
 		return;
 	}
 	// convert config into dict
-	SM_Dict dict = SM_Dict_new(1);
+	struct Dict dict = Dict_new(1);
 	char temp[10];
 
 	sprintf(temp, "%i", cfg->gfx_window_x);
-	SM_Dict_add(&dict, CFG_SETTING_GFX_WINDOW_X, temp);
+	Dict_add(&dict, CFG_SETTING_GFX_WINDOW_X, temp);
 	sprintf(temp, "%i", cfg->gfx_window_y);
-	SM_Dict_add(&dict, CFG_SETTING_GFX_WINDOW_Y, temp);
+	Dict_add(&dict, CFG_SETTING_GFX_WINDOW_Y, temp);
 	sprintf(temp, "%i", cfg->gfx_window_w);
-	SM_Dict_add(&dict, CFG_SETTING_GFX_WINDOW_W, temp);
+	Dict_add(&dict, CFG_SETTING_GFX_WINDOW_W, temp);
 	sprintf(temp, "%i", cfg->gfx_window_h);
-	SM_Dict_add(&dict, CFG_SETTING_GFX_WINDOW_H, temp);
+	Dict_add(&dict, CFG_SETTING_GFX_WINDOW_H, temp);
 	sprintf(temp, "%i", cfg->gfx_window_fullscreen);
-	SM_Dict_add(&dict, CFG_SETTING_GFX_WINDOW_FULLSCREEN, temp);
+	Dict_add(&dict, CFG_SETTING_GFX_WINDOW_FULLSCREEN, temp);
 
 	// save
-	if (!SM_Dict_write(&dict, filepath.str))
-		cfg->invalid = true;
+	if (!Dict_to_file(&dict, filepath.str))
+		cfg->invalid = 1;
 
 	// clear
-	SM_String_clear(&filepath);
-	SM_Dict_clear(&dict);
+	String_clear(&filepath);
+	Dict_clear(&dict);
 }

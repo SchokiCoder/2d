@@ -4,23 +4,24 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include "SGUI_theme.h"
-#include "SGUI_menu.h"
-#include "SGUI_entry.h"
+#include "entry.h"
+#include "menu.h"
+#include "theme.h"
 
-void SGUI_Entry_new(SGUI_Entry * entry, SGUI_Menu * menu, TTF_Font * font,
-		    const SGUI_EntryStyle style)
+void Entry_new(struct Entry             *entry,
+               struct Menu              *menu,
+               TTF_Font                 *font,
+	       const struct EntryStyle  style)
 {
 	entry->menu = menu;
 	entry->font = font;
 
-	entry->sprites =
-	    malloc(SGUI_ENTRY_TEXT_INIT_SIZE * sizeof(SGUI_Sprite));
+	entry->sprites = malloc(ENTRY_TEXT_INIT_SIZE *sizeof(struct Sprite));
 
-	for (size_t i = 0; i < SGUI_ENTRY_TEXT_INIT_SIZE; i++)
-		entry->sprites[i] = SGUI_Sprite_new();
+	for (size_t i = 0; i < ENTRY_TEXT_INIT_SIZE; i++)
+		entry->sprites[i] = Sprite_new();
 
-	entry->text = SM_String_new(SGUI_ENTRY_TEXT_INIT_SIZE);
+	entry->text = String_new(ENTRY_TEXT_INIT_SIZE);
 	entry->visible = true;
 	entry->active = true;
 	entry->style = style;
@@ -29,7 +30,7 @@ void SGUI_Entry_new(SGUI_Entry * entry, SGUI_Menu * menu, TTF_Font * font,
 	menu->entry_count++;
 }
 
-void SGUI_Entry_update_sprite(SGUI_Entry * entry, size_t pos)
+void Entry_update_sprite(struct Entry *entry, size_t pos)
 {
 	// stop if sprite doesn't exist
 	if (pos > (entry->text.len - 1))
@@ -41,44 +42,46 @@ void SGUI_Entry_update_sprite(SGUI_Entry * entry, size_t pos)
 	};
 
 	// clear
-	SGUI_Sprite_clear(&entry->sprites[pos]);
+	Sprite_clear(&entry->sprites[pos]);
 
 	// generate sprite of that letter
-	entry->sprites[pos] = SGUI_Sprite_from_text(entry->menu->renderer,
+	entry->sprites[pos] = Sprite_from_text(entry->menu->renderer,
 						    letter,
 						    entry->font,
 						    entry->style.font_color);
 }
 
-void SGUI_Entry_update_sprites(SGUI_Entry * entry)
+void Entry_update_sprites(struct Entry *entry)
 {
-	for (size_t i = 0; i < entry->text.len; i++) {
-		SGUI_Entry_update_sprite(entry, i);
-	}
+	size_t i;
+	
+	for (i = 0; i < entry->text.len; i++)
+		Entry_update_sprite(entry, i);
 }
 
-void SGUI_Entry_append(SGUI_Entry * entry, SM_String * appendage)
+void Entry_append(struct Entry *entry, struct String *appendage)
 {
 	size_t old_size = entry->text.size;
+	size_t new_size;
+	size_t i;
 
-	// append
-	SM_String_append(&entry->text, appendage);
+	String_append(&entry->text, appendage);
 
 	// increase sprite array size
 	if (entry->text.size > old_size) {
-		entry->sprites =
-		    realloc(entry->sprites, old_size * 2 * sizeof(SGUI_Sprite));
+		new_size = old_size * 2 * sizeof(struct Sprite);
+		entry->sprites = realloc(entry->sprites, new_size);
 
 		for (size_t i = old_size; i < entry->text.size; i++)
-			entry->sprites[i] = SGUI_Sprite_new();
+			entry->sprites[i] = Sprite_new();
 	}
+
 	// update new sprites
-	for (size_t i = entry->text.len - appendage->len; i < entry->text.len;
-	     i++)
-		SGUI_Entry_update_sprite(entry, i);
+	for (i = entry->text.len - appendage->len; i < entry->text.len; i++)
+		Entry_update_sprite(entry, i);
 }
 
-void SGUI_Entry_draw(SGUI_Entry * entry)
+void Entry_draw(struct Entry *entry)
 {
 	SDL_Rect draw_target;
 	u32 text_width = 0;
@@ -128,21 +131,23 @@ void SGUI_Entry_draw(SGUI_Entry * entry)
 	}
 }
 
-void SGUI_Entry_clear_sprites(SGUI_Entry * entry)
+void Entry_clear_sprites(struct Entry *entry)
 {
-	for (size_t i = 0; i < entry->text.len; i++) {
-		SGUI_Sprite_clear(&entry->sprites[i]);
-	}
+	size_t i;
+	
+	for (i = 0; i < entry->text.len; i++)
+		Sprite_clear(&entry->sprites[i]);
 
 	free(entry->sprites);
 }
 
-void SGUI_Entry_resize(SGUI_Entry * entry)
+void Entry_resize(struct Entry *entry)
 {
+	size_t i;
+	
 	entry->rect.h = entry->sprites[0].surface->h;
 	entry->rect.w = 0;
 
-	for (usize i = 0; i < entry->text.len; i++) {
+	for (i = 0; i < entry->text.len; i++)
 		entry->rect.w += entry->sprites[i].surface->w;
-	}
 }

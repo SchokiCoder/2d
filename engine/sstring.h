@@ -7,6 +7,8 @@
 #ifndef _SSTRING_H
 #define _SSTRING_H
 
+#include <stddef.h>
+
 #include "types.h"
 
 static const usize STRING_IMPLICIT_INITIAL_SIZE = 8;

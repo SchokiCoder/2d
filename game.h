@@ -4,41 +4,44 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef GAME_H
-#define GAME_H
+#ifndef _CH_GAME_H
+#define _CH_GAME_H
 
-#include <SG_types.h>
 #include <SDL_render.h>
-#include "entity.h"
+
 #include "block.h"
+#include "gui/sprite.h"
+#include "engine/types.h"
+#include "engine/world.h"
+#include "entity.h"
 
-typedef struct Config Config;
+struct Config;
 
-float now(void);
+f32 now(void);
 
-typedef struct Game {
+struct Game {
 	char *world_name;
 	SDL_Renderer *renderer;
-	Config *cfg;
+	struct Config *cfg;
 
-	SM_String msg;
-	bool active;
-	SGUI_Sprite spr_blocks[B_LAST + 1];
-	SGUI_Sprite spr_walls[B_LAST + 1];
-	SGUI_Sprite spr_ents[E_LAST + 1];
-	SG_World world;
+	struct String msg;
+	int active;
+	struct Sprite spr_blocks[B_LAST + 1];
+	struct Sprite spr_walls[B_LAST + 1];
+	struct Sprite spr_ents[E_LAST + 1];
+	struct World world;
 	SDL_Event event;
-	const uint8_t *kbd;
-	SG_IPoint wld_draw_pts[2];
+	const u8 *kbd;
+	struct IPoint wld_draw_pts[2];
 	SDL_Rect camera;
-} Game;
+};
 
-void Game_setup(Game * game);
+void Game_setup(struct Game *game);
 
-void Game_run(Game * game);
+void Game_run(struct Game *game);
 
-void Game_edit(Game * game, const size_t width, const size_t height);
+void Game_edit(struct Game *game, const size_t width, const size_t height);
 
-void Game_clear(Game * game);
+void Game_clear(struct Game *game);
 
-#endif
+#endif /* _CH_GAME_H */

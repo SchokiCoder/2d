@@ -4,8 +4,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+#ifndef _CH_MOTD_H
+#define _CH_MOTD_H
+
 static const char *MOTDS[] = {
-	"5th Revision",
+	"6th Revision",
 	"my oldest project",
 	"Striitit!",
 	"Alea iacta est",
@@ -24,5 +27,8 @@ static const char *MOTDS[] = {
 	"Advertiser friendly.",
 	"i guess",
 	"seventy meters",
-	"Nile would dissolve"
+	"Nile would dissolve",
+	"that just aint right"
 };
+
+#endif /* _CH_MOTD_H */

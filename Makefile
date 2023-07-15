@@ -2,18 +2,30 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-CC = cc
-INCLUDE = -I /usr/include/SDL2
-CFLAGS = -std=c99 -Wall -Wextra $(INCLUDE)
-LIBS = -l SDL2 -l SDL2_image -l SDL2_ttf
+APP_NAME=chemarium
+APP_VERSION=0.0.0
+APP_LICENSE=MPLv2
+APP_LICENSE_SOURCE1=If a copy of the MPL was not distributed with this file,
+APP_LICENSE_SOURCE2=You can obtain one at https://mozilla.org/MPL/2.0/.
+APP_SOURCE=https://github.com/SchokiCoder/chemarium
 
-#INSTALL_BIN_DIR = /usr/bin
-#INSTALL_ASSETS_DIR = /usr/share/${APP_NAME}
-#INSTALL_TEXTURES_DIR = ${INSTALL_ASSETS_DIR}/textures
-#INSTALL_DESKTOP_DIR = /usr/share/applications
-#INSTALL_ICONS_DIR = /usr/share/icons/hicolor
+BIN_DIR=$(HOME)/.local/bin
+TEXTURES_DIR=$(HOME)/.local/share/$(APP_NAME)/textures
+#DESKTOP_DIR=/usr/share/applications
+#ICONS_DIR=/usr/share/icons/hicolor
 
-#DEFINES = -D PATH_ASSETS="\"${INSTALL_ASSETS_DIR}/\"" -D PATH_TEXTURES="\"${INSTALL_TEXTURES_DIR}/\""
+DEFINES=-D PATH_TEXTURES="\"$(TEXTURES_DIR)/\"" \
+	-D APP_NAME="\"$(APP_NAME)\"" \
+	-D APP_VERSION="\"$(APP_VERSION)\"" \
+	-D APP_LICENSE="\"$(APP_LICENSE)\"" \
+	-D APP_LICENSE_SOURCE1="\"$(APP_LICENSE_SOURCE1)\"" \
+	-D APP_LICENSE_SOURCE2="\"$(APP_LICENSE_SOURCE2)\"" \
+	-D APP_SOURCE="\"$(APP_SOURCE)\""
+
+CC=cc
+INCLUDE=-I . -I /usr/include/SDL2
+LIBS=-l SDL2 -l SDL2_image -l SDL2_ttf
+CFLAGS=-std=c99 -Wall -Wextra $(INCLUDE) $(LIBS) $(DEFINES)
 
 TARGETS_GUI=gui/sprite.o \
 	gui/entry.o \
@@ -34,7 +46,7 @@ chemarium: $(TARGETS)
 	$(CC) $(CFLAGS) -Os -o $@ $^
 
 chemarium_d: $(TARGETS)
-	$(CC) $(CFLAGS) -g -o $@ $^
+	$(CC) $(CFLAGS) -g -D _DEBUG -o $@ $^
 
 config.o: config.c config.h
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -83,3 +95,8 @@ engine/sstring.o: engine/sstring.c engine/sstring.h
 
 engine/dict.o: engine/dict.c engine/dict.h
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+clean:
+	rm -f $(TARGETS)
+	rm -f chemarium
+	rm -f chemarium_d

@@ -12,7 +12,7 @@
 #include "sstring.h"
 #include "types.h"
 
-struct Entity Entity;
+struct Entity;
 
 struct World {
 	int invalid;
@@ -34,7 +34,7 @@ struct World World_new(const u32 block_size,
 
 struct World World_from_file(const char *filepath);
 
-void World_write(struct World *world, const char *filepath);
+void World_to_file(struct World *world, const char *filepath);
 
 void World_clear(struct World *world);
 

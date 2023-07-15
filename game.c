@@ -4,21 +4,16 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <SM_log.h>
-#include <SM_string.h>
-#include <SGUI_sprite.h>
-#include <SGUI_theme.h>
 #include <time.h>
-#include "path.h"
-#include "config.h"
-#include "world.h"
-#include "game.h"
 
-#ifdef _WIN32
-#define SLASH "\\"
-#else
-#define SLASH "/"
-#endif
+#include "config.h"
+#include "engine/log.h"
+#include "engine/sstring.h"
+#include "game.h"
+#include "gui/sprite.h"
+#include "gui/theme.h"
+#include "path.h"
+#include "world.h"
 
 #define PATH_TEXTURES_BLOCKS_DIR PATH_TEXTURES "blocks"
 #define PATH_TEXTURES_ENTITIES_DIR PATH_TEXTURES "entities"
@@ -32,10 +27,10 @@ static const char *PATH_TEXTURES_ENTITIES[] = {
 	PATH_TEXTURES_ENTITIES_DIR SLASH "player.png"
 };
 
-static const float TIMESCALE = 1.0f;
+static const f32 TIMESCALE = 1.0f;
 
 #ifdef _DEBUG
-static const SGUI_Theme THEME_DEBUG = {
+static const Theme THEME_DEBUG = {
 	.menu = {
 		 .bg_color = {.r = 155,.g = 219,.b = 245,.a = 0},
 		 },
@@ -62,20 +57,20 @@ static const SGUI_Theme THEME_DEBUG = {
 };
 #endif
 
-static const float EDIT_MOVE_SPEED = BLOCK_SIZE * 12;
+static const f32 EDIT_MOVE_SPEED = BLOCK_SIZE * 12;
 static const size_t EDIT_CROSSHAIR_SIZE = 10;
-static const float EDIT_SELECT_DELAY = 0.25f;
-static const float EDIT_SAVE_DELAY = 1.0f;
+static const f32 EDIT_SELECT_DELAY = 0.25f;
+static const f32 EDIT_SAVE_DELAY = 1.0f;
 
-float now(void)
+f32 now(void)
 {
-	return (float)clock() / (float)CLOCKS_PER_SEC;
+	return (f32)clock() / (f32)CLOCKS_PER_SEC;
 }
 
-void Game_setup(Game * game)
+void Game_setup(struct Game *game)
 {
-	game->active = true;
-	game->msg = SM_String_new(8);
+	game->active = 1;
+	game->msg = String_new(8);
 
 	// set viewport
 	game->camera.x = 0;
@@ -84,13 +79,13 @@ void Game_setup(Game * game)
 	game->camera.h = game->cfg->gfx_window_h;
 
 	// init sprites
-	for (uint_fast32_t i = 0; i <= B_LAST; i++) {
-		game->spr_blocks[i] = SGUI_Sprite_new();
-		game->spr_walls[i] = SGUI_Sprite_new();
+	for (u32 i = 0; i <= B_LAST; i++) {
+		game->spr_blocks[i] = Sprite_new();
+		game->spr_walls[i] = Sprite_new();
 	}
 
-	for (uint_fast32_t i = 0; i <= E_LAST; i++)
-		game->spr_ents[i] = SGUI_Sprite_new();
+	for (u32 i = 0; i <= E_LAST; i++)
+		game->spr_ents[i] = Sprite_new();
 
 	// open world and check
 	game->world = World_from_file(game->world_name);
@@ -100,28 +95,28 @@ void Game_setup(Game * game)
 		return;
 	}
 	// load block sprites
-	for (uint_fast32_t i = 1; i <= B_LAST; i++) {
+	for (u32 i = 1; i <= B_LAST; i++) {
 		game->spr_blocks[i] =
-		    SGUI_Sprite_from_file(game->renderer,
+		    Sprite_from_file(game->renderer,
 					  PATH_TEXTURES_BLOCKS[i - 1]);
 
 		if (game->spr_blocks[i].invalid) {
-			SM_String_copy_cstr(&game->msg, "Sprite ");
-			SM_String_append_cstr(&game->msg,
+			String_copy_cstr(&game->msg, "Sprite ");
+			String_append_cstr(&game->msg,
 					      PATH_TEXTURES_BLOCKS[i - 1]);
-			SM_String_append_cstr(&game->msg,
+			String_append_cstr(&game->msg,
 					      " could not be loaded.");
 
-			SM_log_err(game->msg.str);
+			log_err(game->msg.str);
 			Game_clear(game);
 			return;
 		}
 	}
 
 	// create wall sprites
-	for (uint_fast32_t i = 1; i <= B_LAST; i++) {
+	for (u32 i = 1; i <= B_LAST; i++) {
 		// copy block surface, modify, create texture
-		game->spr_walls[i].invalid = false;
+		game->spr_walls[i].invalid = 0;
 
 		game->spr_walls[i].surface =
 		    SDL_ConvertSurface(game->spr_blocks[i].surface,
@@ -129,11 +124,11 @@ void Game_setup(Game * game)
 
 		SDL_SetSurfaceColorMod(game->spr_walls[i].surface, 175, 175,
 				       175);
-		SGUI_Sprite_create_texture(&game->spr_walls[i], game->renderer);
+		Sprite_create_texture(&game->spr_walls[i], game->renderer);
 
 		// check sprite
 		if (game->spr_walls[i].invalid) {
-			SM_log_err
+			log_err
 			    ("Wall-sprite could not be generated from block-sprite.");
 			Game_clear(game);
 			return;
@@ -141,27 +136,27 @@ void Game_setup(Game * game)
 	}
 
 	// load ent sprites
-	for (uint_fast32_t i = 1; i <= E_LAST; i++) {
+	for (u32 i = 1; i <= E_LAST; i++) {
 		game->spr_ents[i] =
-		    SGUI_Sprite_from_file(game->renderer,
+		    Sprite_from_file(game->renderer,
 					  PATH_TEXTURES_ENTITIES[i - 1]);
 
 		if (game->spr_ents[i].invalid) {
-			SM_String_copy_cstr(&game->msg, "Sprite ");
-			SM_String_append_cstr(&game->msg,
+			String_copy_cstr(&game->msg, "Sprite ");
+			String_append_cstr(&game->msg,
 					      PATH_TEXTURES_ENTITIES[i - 1]);
-			SM_String_append_cstr(&game->msg,
+			String_append_cstr(&game->msg,
 					      " could not be loaded.");
 
-			SM_log_err(game->msg.str);
+			log_err(game->msg.str);
 			Game_clear(game);
 			return;
 		}
 	}
 
 	// map textures
-	for (uint_fast32_t x = 0; x < game->world.width; x++) {
-		for (uint_fast32_t y = 0; y < game->world.height; y++) {
+	for (u32 x = 0; x < game->world.width; x++) {
+		for (u32 y = 0; y < game->world.height; y++) {
 			game->world.block_textures[x][y][0] =
 			    game->spr_blocks[game->world.blocks[x][y][0]].
 			    texture;
@@ -175,28 +170,28 @@ void Game_setup(Game * game)
 	game->kbd = SDL_GetKeyboardState(NULL);
 }
 
-void Game_run(Game * game)
+void Game_run(struct Game *game)
 {
 #ifdef _DEBUG
 	TTF_Font *font;
-	SGUI_Menu mnu_debugvals;
-	SGUI_Label lbl_velocity_x;
-	SGUI_Label lbl_velocity_x_val;
-	SGUI_Label lbl_velocity_y;
-	SGUI_Label lbl_velocity_y_val;
-	SGUI_Label lbl_pos_x;
-	SGUI_Label lbl_pos_x_val;
-	SGUI_Label lbl_pos_y;
-	SGUI_Label lbl_pos_y_val;
-	SGUI_Label lbl_grounded;
-	SGUI_Label lbl_grounded_val;
+	struct Menu mnu_debugvals;
+	struct Label lbl_velocity_x;
+	struct Label lbl_velocity_x_val;
+	struct Label lbl_velocity_y;
+	struct Label lbl_velocity_y_val;
+	struct Label lbl_pos_x;
+	struct Label lbl_pos_x_val;
+	struct Label lbl_pos_y;
+	struct Label lbl_pos_y_val;
+	struct Label lbl_grounded;
+	struct Label lbl_grounded_val;
 #endif
 
-	SG_Entity *player = NULL;
+	struct Entity *player = NULL;
 	SDL_Rect temp;
-	float ts1, ts2, delta = 0.0f;
-	float x_step = 0.0f;
-	float y_step = 0.0f;
+	f32 ts1, ts2, delta = 0.0f;
+	f32 x_step = 0.0f;
+	f32 y_step = 0.0f;
 
 	// setup
 	Game_setup(game);
@@ -207,11 +202,11 @@ void Game_run(Game * game)
 			player = &game->world.entities[i];
 
 	if (player == NULL) {
-		SM_String_copy_cstr(&game->msg, "World ");
-		SM_String_append_cstr(&game->msg, game->world_name);
-		SM_String_append_cstr(&game->msg,
+		String_copy_cstr(&game->msg, "World ");
+		String_append_cstr(&game->msg, game->world_name);
+		String_append_cstr(&game->msg,
 				      " does not contain a player entity.");
-		SM_log_err(game->msg.str);
+		log_err(game->msg.str);
 
 		Game_clear(game);
 		return;
@@ -223,21 +218,21 @@ void Game_run(Game * game)
 			 16);
 
 	// make debug values menu
-	mnu_debugvals = SGUI_Menu_new(game->renderer, THEME_DEBUG.menu);
-	SGUI_Label_new(&lbl_velocity_x, &mnu_debugvals, font,
+	mnu_debugvals = Menu_new(game->renderer, THEME_DEBUG.menu);
+	Label_new(&lbl_velocity_x, &mnu_debugvals, font,
 		       THEME_DEBUG.label);
-	SGUI_Label_new(&lbl_velocity_x_val, &mnu_debugvals, font,
+	Label_new(&lbl_velocity_x_val, &mnu_debugvals, font,
 		       THEME_DEBUG.label);
-	SGUI_Label_new(&lbl_velocity_y, &mnu_debugvals, font,
+	Label_new(&lbl_velocity_y, &mnu_debugvals, font,
 		       THEME_DEBUG.label);
-	SGUI_Label_new(&lbl_velocity_y_val, &mnu_debugvals, font,
+	Label_new(&lbl_velocity_y_val, &mnu_debugvals, font,
 		       THEME_DEBUG.label);
-	SGUI_Label_new(&lbl_pos_x, &mnu_debugvals, font, THEME_DEBUG.label);
-	SGUI_Label_new(&lbl_pos_x_val, &mnu_debugvals, font, THEME_DEBUG.label);
-	SGUI_Label_new(&lbl_pos_y, &mnu_debugvals, font, THEME_DEBUG.label);
-	SGUI_Label_new(&lbl_pos_y_val, &mnu_debugvals, font, THEME_DEBUG.label);
-	SGUI_Label_new(&lbl_grounded, &mnu_debugvals, font, THEME_DEBUG.label);
-	SGUI_Label_new(&lbl_grounded_val, &mnu_debugvals, font,
+	Label_new(&lbl_pos_x, &mnu_debugvals, font, THEME_DEBUG.label);
+	Label_new(&lbl_pos_x_val, &mnu_debugvals, font, THEME_DEBUG.label);
+	Label_new(&lbl_pos_y, &mnu_debugvals, font, THEME_DEBUG.label);
+	Label_new(&lbl_pos_y_val, &mnu_debugvals, font, THEME_DEBUG.label);
+	Label_new(&lbl_grounded, &mnu_debugvals, font, THEME_DEBUG.label);
+	Label_new(&lbl_grounded_val, &mnu_debugvals, font,
 		       THEME_DEBUG.label);
 
 	// define menu
@@ -246,75 +241,75 @@ void Game_run(Game * game)
 	mnu_debugvals.rect.w = game->cfg->gfx_window_w;
 	mnu_debugvals.rect.h = game->cfg->gfx_window_h;
 
-	SM_String_copy_cstr(&lbl_velocity_x.text, "vel_x:");
-	SGUI_Label_update_sprite(&lbl_velocity_x);
+	String_copy_cstr(&lbl_velocity_x.text, "vel_x:");
+	Label_update_sprite(&lbl_velocity_x);
 	lbl_velocity_x.rect.w = lbl_velocity_x.sprite.surface->w;
 	lbl_velocity_x.rect.h = lbl_velocity_x.sprite.surface->h;
 	lbl_velocity_x.rect.x = 0;
 	lbl_velocity_x.rect.y = 0;
 
-	SM_String_copy_cstr(&lbl_velocity_x_val.text, "0");
-	SGUI_Label_update_sprite(&lbl_velocity_x_val);
+	String_copy_cstr(&lbl_velocity_x_val.text, "0");
+	Label_update_sprite(&lbl_velocity_x_val);
 	lbl_velocity_x_val.rect.w = lbl_velocity_x_val.sprite.surface->w;
 	lbl_velocity_x_val.rect.h = lbl_velocity_x_val.sprite.surface->h;
 	lbl_velocity_x_val.rect.x =
 	    lbl_velocity_x.rect.x + lbl_velocity_x.rect.w + 10;
 	lbl_velocity_x_val.rect.y = lbl_velocity_x.rect.y;
 
-	SM_String_copy_cstr(&lbl_velocity_y.text, "vel_y:");
-	SGUI_Label_update_sprite(&lbl_velocity_y);
+	String_copy_cstr(&lbl_velocity_y.text, "vel_y:");
+	Label_update_sprite(&lbl_velocity_y);
 	lbl_velocity_y.rect.w = lbl_velocity_y.sprite.surface->w;
 	lbl_velocity_y.rect.h = lbl_velocity_y.sprite.surface->h;
 	lbl_velocity_y.rect.x = lbl_velocity_x.rect.x;
 	lbl_velocity_y.rect.y =
 	    lbl_velocity_x.rect.y + lbl_velocity_x.rect.h + 10;
 
-	SM_String_copy_cstr(&lbl_velocity_y_val.text, "0");
-	SGUI_Label_update_sprite(&lbl_velocity_y_val);
+	String_copy_cstr(&lbl_velocity_y_val.text, "0");
+	Label_update_sprite(&lbl_velocity_y_val);
 	lbl_velocity_y_val.rect.w = lbl_velocity_y_val.sprite.surface->w;
 	lbl_velocity_y_val.rect.h = lbl_velocity_y_val.sprite.surface->h;
 	lbl_velocity_y_val.rect.x =
 	    lbl_velocity_y.rect.x + lbl_velocity_y.rect.w + 10;
 	lbl_velocity_y_val.rect.y = lbl_velocity_y.rect.y;
 
-	SM_String_copy_cstr(&lbl_pos_x.text, "pos_x:");
-	SGUI_Label_update_sprite(&lbl_pos_x);
+	String_copy_cstr(&lbl_pos_x.text, "pos_x:");
+	Label_update_sprite(&lbl_pos_x);
 	lbl_pos_x.rect.w = lbl_pos_x.sprite.surface->w;
 	lbl_pos_x.rect.h = lbl_pos_x.sprite.surface->h;
 	lbl_pos_x.rect.x = lbl_velocity_x.rect.x;
 	lbl_pos_x.rect.y =
 	    lbl_velocity_y_val.rect.y + lbl_velocity_y_val.rect.h + 10;
 
-	SM_String_copy_cstr(&lbl_pos_x_val.text, "0");
-	SGUI_Label_update_sprite(&lbl_pos_x_val);
+	String_copy_cstr(&lbl_pos_x_val.text, "0");
+	Label_update_sprite(&lbl_pos_x_val);
 	lbl_pos_x_val.rect.w = lbl_pos_x_val.sprite.surface->w;
 	lbl_pos_x_val.rect.h = lbl_pos_x_val.sprite.surface->h;
 	lbl_pos_x_val.rect.x = lbl_pos_x.rect.x + lbl_pos_x.rect.w + 10;
 	lbl_pos_x_val.rect.y = lbl_pos_x.rect.y;
 
-	SM_String_copy_cstr(&lbl_pos_y.text, "pos_y:");
-	SGUI_Label_update_sprite(&lbl_pos_y);
+	String_copy_cstr(&lbl_pos_y.text, "pos_y:");
+	Label_update_sprite(&lbl_pos_y);
 	lbl_pos_y.rect.w = lbl_pos_y.sprite.surface->w;
 	lbl_pos_y.rect.h = lbl_pos_y.sprite.surface->h;
 	lbl_pos_y.rect.x = lbl_velocity_x.rect.x;
 	lbl_pos_y.rect.y = lbl_pos_x_val.rect.y + lbl_pos_x_val.rect.h + 10;
 
-	SM_String_copy_cstr(&lbl_pos_y_val.text, "0");
-	SGUI_Label_update_sprite(&lbl_pos_y_val);
+	String_copy_cstr(&lbl_pos_y_val.text, "0");
+	Label_update_sprite(&lbl_pos_y_val);
 	lbl_pos_y_val.rect.w = lbl_pos_y_val.sprite.surface->w;
 	lbl_pos_y_val.rect.h = lbl_pos_y_val.sprite.surface->h;
 	lbl_pos_y_val.rect.x = lbl_pos_x.rect.x + lbl_pos_x.rect.w + 10;
 	lbl_pos_y_val.rect.y = lbl_pos_y.rect.y;
 
-	SM_String_copy_cstr(&lbl_grounded.text, "grnd:");
-	SGUI_Label_update_sprite(&lbl_grounded);
+	String_copy_cstr(&lbl_grounded.text, "grnd:");
+	Label_update_sprite(&lbl_grounded);
 	lbl_grounded.rect.w = lbl_grounded.sprite.surface->w;
 	lbl_grounded.rect.h = lbl_grounded.sprite.surface->h;
 	lbl_grounded.rect.x = lbl_velocity_x.rect.x;
 	lbl_grounded.rect.y = lbl_pos_y_val.rect.y + lbl_pos_y_val.rect.h + 10;
 
-	SM_String_copy_cstr(&lbl_grounded_val.text, "0");
-	SGUI_Label_update_sprite(&lbl_grounded_val);
+	String_copy_cstr(&lbl_grounded_val.text, "0");
+	Label_update_sprite(&lbl_grounded_val);
 	lbl_grounded_val.rect.w = lbl_grounded_val.sprite.surface->w;
 	lbl_grounded_val.rect.h = lbl_grounded_val.sprite.surface->h;
 	lbl_grounded_val.rect.x =
@@ -331,7 +326,7 @@ void Game_run(Game * game)
 			// app events
 			switch (game->event.type) {
 			case SDL_QUIT:
-				game->active = false;
+				game->active = 0;
 				break;
 			}
 		}
@@ -395,7 +390,7 @@ void Game_run(Game * game)
 		sprintf(lbl_velocity_x_val.text.str, "%f", player->velocity_x);
 		lbl_velocity_x_val.text.len =
 		    strlen(lbl_velocity_x_val.text.str);
-		SGUI_Label_update_sprite(&lbl_velocity_x_val);
+		Label_update_sprite(&lbl_velocity_x_val);
 		lbl_velocity_x_val.rect.w =
 		    lbl_velocity_x_val.sprite.surface->w;
 		lbl_velocity_x_val.rect.h =
@@ -404,7 +399,7 @@ void Game_run(Game * game)
 		sprintf(lbl_velocity_y_val.text.str, "%f", player->velocity_y);
 		lbl_velocity_y_val.text.len =
 		    strlen(lbl_velocity_y_val.text.str);
-		SGUI_Label_update_sprite(&lbl_velocity_y_val);
+		Label_update_sprite(&lbl_velocity_y_val);
 		lbl_velocity_y_val.rect.w =
 		    lbl_velocity_y_val.sprite.surface->w;
 		lbl_velocity_y_val.rect.h =
@@ -412,19 +407,19 @@ void Game_run(Game * game)
 
 		sprintf(lbl_pos_x_val.text.str, "%f", player->rect.x);
 		lbl_pos_x_val.text.len = strlen(lbl_pos_x_val.text.str);
-		SGUI_Label_update_sprite(&lbl_pos_x_val);
+		Label_update_sprite(&lbl_pos_x_val);
 		lbl_pos_x_val.rect.w = lbl_pos_x_val.sprite.surface->w;
 		lbl_pos_x_val.rect.h = lbl_pos_x_val.sprite.surface->h;
 
 		sprintf(lbl_pos_y_val.text.str, "%f", player->rect.y);
 		lbl_pos_y_val.text.len = strlen(lbl_pos_y_val.text.str);
-		SGUI_Label_update_sprite(&lbl_pos_y_val);
+		Label_update_sprite(&lbl_pos_y_val);
 		lbl_pos_y_val.rect.w = lbl_pos_y_val.sprite.surface->w;
 		lbl_pos_y_val.rect.h = lbl_pos_y_val.sprite.surface->h;
 
 		sprintf(lbl_grounded_val.text.str, "%i", player->grounded);
 		lbl_grounded_val.text.len = strlen(lbl_grounded_val.text.str);
-		SGUI_Label_update_sprite(&lbl_grounded_val);
+		Label_update_sprite(&lbl_grounded_val);
 		lbl_grounded_val.rect.w = lbl_grounded_val.sprite.surface->w;
 		lbl_grounded_val.rect.h = lbl_grounded_val.sprite.surface->h;
 #endif
@@ -460,10 +455,10 @@ void Game_run(Game * game)
 		game->wld_draw_pts[1].y =
 		    ((game->camera.y + game->camera.h) / BLOCK_SIZE) + 1;
 
-		if (game->wld_draw_pts[1].x >= (s32_t) game->world.width)
+		if (game->wld_draw_pts[1].x >= (i32) game->world.width)
 			game->wld_draw_pts[1].x = game->world.width;
 
-		if (game->wld_draw_pts[1].y >= (s32_t) game->world.height)
+		if (game->wld_draw_pts[1].y >= (i32) game->world.height)
 			game->wld_draw_pts[1].y = game->world.height;
 
 		// draw background
@@ -512,7 +507,7 @@ void Game_run(Game * game)
 
 #ifdef _DEBUG
 		// draw debug menu
-		SGUI_Menu_draw(&mnu_debugvals);
+		Menu_draw(&mnu_debugvals);
 #endif
 
 		// show drawn image
@@ -528,14 +523,14 @@ void Game_run(Game * game)
 	Game_clear(game);
 }
 
-void Game_edit(Game * game, const size_t width, const size_t height)
+void Game_edit(struct Game *game, const size_t width, const size_t height)
 {
-	SM_String filepath = SM_String_new(8);
-	float edit_move_speed;
+	struct String filepath = String_new(8);
+	f32 edit_move_speed;
 	SDL_Rect temp;
-	uint32_t mouse_state;
+	u32 mouse_state;
 	SDL_Rect mouse_pos;
-	SG_FPoint edit_pos = {
+	struct FPoint edit_pos = {
 		.x = 0.0f,
 		.y = 0.0f,
 	};
@@ -543,23 +538,23 @@ void Game_edit(Game * game, const size_t width, const size_t height)
 		.x = 0,
 		.y = 0,
 	};
-	Block edit_block = B_FIRST;
-	float ts1, ts2, delta = 0.0f;
-	float ts_ui_event = 0.0f;
-	bool edit_draw_grid = true;
-	bool edit_draw_blocks = true;
-	bool edit_draw_walls = true;
+	enum Blocks edit_block = B_FIRST;
+	f32 ts1, ts2, delta = 0.0f;
+	f32 ts_ui_event = 0.0f;
+	int edit_draw_grid = 1;
+	int edit_draw_blocks = 1;
+	int edit_draw_walls = 1;
 
 	// if world does not yet exist, create
 	if (get_world_path(&filepath) != 0)
 		return;
 
-	SM_String_append_cstr(&filepath, game->world_name);
-	SM_String_append_cstr(&filepath, ".");
-	SM_String_append_cstr(&filepath, FILETYPE_WORLD);
+	String_append_cstr(&filepath, game->world_name);
+	String_append_cstr(&filepath, ".");
+	String_append_cstr(&filepath, FILETYPE_WORLD);
 
-	if (file_check_existence(filepath.str) == false) {
-		game->world = World_new(width, height);
+	if (file_check_existence(filepath.str) == 0) {
+		game->world = Ch_World_new(width, height);
 
 		for (size_t x = 0; x < game->world.width; x++) {
 			for (size_t y = 0; y < game->world.height; y++) {
@@ -568,9 +563,9 @@ void Game_edit(Game * game, const size_t width, const size_t height)
 			}
 		}
 
-		World_write(&game->world, game->world_name);
+		Ch_World_to_file(&game->world, game->world_name);
 
-		SG_World_clear(&game->world);
+		World_clear(&game->world);
 	}
 	// setup
 	Game_setup(game);
@@ -635,7 +630,7 @@ void Game_edit(Game * game, const size_t width, const size_t height)
 				break;
 
 			case SDL_QUIT:
-				game->active = false;
+				game->active = 0;
 				break;
 			}
 		}
@@ -703,13 +698,13 @@ void Game_edit(Game * game, const size_t width, const size_t height)
 			// ctrl + s, save
 			if (game->kbd[SDL_SCANCODE_LCTRL] &&
 			    game->kbd[SDL_SCANCODE_S]) {
-				World_write(&game->world, game->world_name);
+				World_to_file(&game->world, game->world_name);
 				ts_ui_event = now();
 			}
 			// ctrl + q, quit
 			if (game->kbd[SDL_SCANCODE_LCTRL] &&
 			    game->kbd[SDL_SCANCODE_Q]) {
-				game->active = false;
+				game->active = 0;
 				ts_ui_event = now();
 			}
 		}
@@ -756,10 +751,10 @@ void Game_edit(Game * game, const size_t width, const size_t height)
 		game->wld_draw_pts[1].y =
 		    ((game->camera.y + game->camera.h) / BLOCK_SIZE);
 
-		if (game->wld_draw_pts[1].x >= (s32_t) game->world.width)
+		if (game->wld_draw_pts[1].x >= (i32) game->world.width)
 			game->wld_draw_pts[1].x = game->world.width;
 
-		if (game->wld_draw_pts[1].y >= (s32_t) game->world.height)
+		if (game->wld_draw_pts[1].y >= (i32) game->world.height)
 			game->wld_draw_pts[1].y = game->world.height;
 
 		// draw background
@@ -879,24 +874,23 @@ void Game_edit(Game * game, const size_t width, const size_t height)
 	Game_clear(game);
 }
 
-void Game_clear(Game * game)
+void Game_clear(struct Game *game)
 {
 	// reset viewport
 	SDL_RenderSetViewport(game->renderer, NULL);
 
 	// sprites
-	for (uint_fast32_t i = 1; i <= B_LAST; i++) {
-		SGUI_Sprite_clear(&game->spr_blocks[i]);
-		SGUI_Sprite_clear(&game->spr_walls[i]);
+	for (u32 i = 1; i <= B_LAST; i++) {
+		Sprite_clear(&game->spr_blocks[i]);
+		Sprite_clear(&game->spr_walls[i]);
 	}
 
-	for (uint_fast32_t i = 1; i <= E_LAST; i++) {
-		SGUI_Sprite_clear(&game->spr_ents[i]);
-	}
+	for (u32 i = 1; i <= E_LAST; i++)
+		Sprite_clear(&game->spr_ents[i]);
 
 	// world
-	SG_World_clear(&game->world);
+	World_clear(&game->world);
 
 	// string
-	SM_String_clear(&game->msg);
+	String_clear(&game->msg);
 }

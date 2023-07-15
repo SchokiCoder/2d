@@ -5,16 +5,17 @@
  */
 
 #include <SDL_events.h>
-#include <SM_string.h>
-#include "SGUI_theme.h"
-#include "SGUI_label.h"
-#include "SGUI_button.h"
-#include "SGUI_entry.h"
-#include "SGUI_menu.h"
 
-SGUI_Menu SGUI_Menu_new(SDL_Renderer * renderer, const SGUI_MenuStyle style)
+#include "button.h"
+#include "engine/sstring.h"
+#include "entry.h"
+#include "label.h"
+#include "menu.h"
+#include "theme.h"
+
+struct Menu Menu_new(SDL_Renderer *renderer, const struct MenuStyle style)
 {
-	SGUI_Menu result = {
+	struct Menu result = {
 		.renderer = renderer,
 		.label_count = 0,
 		.button_count = 0,
@@ -28,7 +29,7 @@ SGUI_Menu SGUI_Menu_new(SDL_Renderer * renderer, const SGUI_MenuStyle style)
 	return result;
 }
 
-void SGUI_Menu_draw(SGUI_Menu * menu)
+void Menu_draw(struct Menu *menu)
 {
 	// stop if not visible
 	if (menu->visible == false)
@@ -44,26 +45,26 @@ void SGUI_Menu_draw(SGUI_Menu * menu)
 	// draw labels
 	for (u8 i = 0; i < menu->label_count; i++) {
 		if (menu->labels[i]->visible) {
-			SGUI_Label_draw(menu->labels[i]);
+			Label_draw(menu->labels[i]);
 		}
 	}
 
 	// draw buttons
 	for (u8 i = 0; i < menu->button_count; i++) {
 		if (menu->buttons[i]->visible) {
-			SGUI_Button_draw(menu->buttons[i]);
+			Button_draw(menu->buttons[i]);
 		}
 	}
 
 	// draw entries
 	for (u8 i = 0; i < menu->entry_count; i++) {
 		if (menu->entries[i]->visible) {
-			SGUI_Entry_draw(menu->entries[i]);
+			Entry_draw(menu->entries[i]);
 		}
 	}
 }
 
-void SGUI_Menu_handle_event(SGUI_Menu * menu, SDL_Event * event)
+void Menu_handle_event(struct Menu *menu, SDL_Event *event)
 {
 	SDL_Point mouse;
 
@@ -73,7 +74,6 @@ void SGUI_Menu_handle_event(SGUI_Menu * menu, SDL_Event * event)
 
 	// handle current event
 	switch (event->type) {
-		// mouse click
 	case SDL_MOUSEBUTTONUP:
 
 		// get mouse coords
@@ -112,14 +112,13 @@ void SGUI_Menu_handle_event(SGUI_Menu * menu, SDL_Event * event)
 		}
 		break;
 
-		// keyboard
 	case SDL_TEXTINPUT:
 
 		// if menu has a focused entry
 		if (menu->focused_entry != NULL) {
 			// add new characters
-			SM_String new = SM_String_contain(event->text.text);
-			SGUI_Entry_append(menu->focused_entry, &new);
+			struct String new = String_contain(event->text.text);
+			Entry_append(menu->focused_entry, &new);
 		}
 		break;
 
@@ -143,36 +142,36 @@ void SGUI_Menu_handle_event(SGUI_Menu * menu, SDL_Event * event)
 	}
 }
 
-void SGUI_Menu_grid(SGUI_Menu * menu)
+void Menu_grid(struct Menu *menu)
 {
-	typedef enum WidgetType {
+	enum WidgetType {
 		WT_None,
 		WT_Label,
 		WT_Button,
 		WT_Entry,
-	} WidgetType;
+	};
 
-	typedef union WidgetPointer {
-		SGUI_Label *label;
-		SGUI_Button *button;
-		SGUI_Entry *entry;
-	} WidgetPointer;
+	union WidgetPointer {
+		struct Label *label;
+		struct Button *button;
+		struct Entry *entry;
+	};
 
-	typedef struct WidgetReference {
-		WidgetType type;
-		WidgetPointer ptr;
-	} WidgetReference;
+	struct WidgetReference {
+		enum WidgetType type;
+		union WidgetPointer ptr;
+	};
 
-	typedef struct CellData {
-		WidgetReference wref;
+	struct CellData {
+		struct WidgetReference wref;
 		u32 width;
 		u32 height;
-	} CellData;
+	};
 
 	const usize TABLE_W = 256;
 	const usize TABLE_H = 256;
 
-	CellData table[TABLE_W][TABLE_H];
+	struct CellData table[TABLE_W][TABLE_H];
 	u32 colwidth[TABLE_W];
 	u32 rowheight[TABLE_H];
 
@@ -270,20 +269,20 @@ void SGUI_Menu_grid(SGUI_Menu * menu)
 	}
 }
 
-void SGUI_Menu_clear(SGUI_Menu * menu)
+void Menu_clear(struct Menu *menu)
 {
 	for (u8 i = 0; i < menu->label_count; i++) {
-		SGUI_Sprite_clear(&menu->labels[i]->sprite);
-		SM_String_clear(&menu->labels[i]->text);
+		Sprite_clear(&menu->labels[i]->sprite);
+		String_clear(&menu->labels[i]->text);
 	}
 
 	for (u8 i = 0; i < menu->button_count; i++) {
-		SGUI_Sprite_clear(&menu->buttons[i]->sprite);
-		SM_String_clear(&menu->buttons[i]->text);
+		Sprite_clear(&menu->buttons[i]->sprite);
+		String_clear(&menu->buttons[i]->text);
 	}
 
 	for (u8 i = 0; i < menu->entry_count; i++) {
-		SGUI_Entry_clear_sprites(menu->entries[i]);
-		SM_String_clear(&menu->entries[i]->text);
+		Entry_clear_sprites(menu->entries[i]);
+		String_clear(&menu->entries[i]->text);
 	}
 }

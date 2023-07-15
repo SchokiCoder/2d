@@ -4,16 +4,17 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <stdio.h>
 #include <stdint.h>
-#include <SM_log.h>
-#include "path.h"
+#include <stdio.h>
+
+#include "engine/log.h"
 #include "entity.h"
+#include "path.h"
 #include "world.h"
 
-SG_World World_new(const size_t width, const size_t height)
+struct World Ch_World_new(const size_t width, const size_t height)
 {
-	SG_World world = SG_World_new(BLOCK_SIZE, width, height, 2);
+	struct World world = World_new(BLOCK_SIZE, width, height, 2);
 
 	// set values
 	world.entities[0].id = E_PLAYER;
@@ -21,69 +22,69 @@ SG_World World_new(const size_t width, const size_t height)
 	world.entities[0].rect.y = 0.0f;
 	world.entities[0].rect.w = DATA_ENTITIES[E_PLAYER].width;
 	world.entities[0].rect.h = DATA_ENTITIES[E_PLAYER].height;
-	world.entities[0].grounded = false;
+	world.entities[0].grounded = 0;
 	world.entities[0].velocity_x = 0.0f;
 	world.entities[0].velocity_y = 0.0f;
 
 	return world;
 }
 
-SG_World World_from_file(const char *world_name)
+struct World Ch_World_from_file(const char *world_name)
 {
-	SG_World world;
-	SM_String filepath = SM_String_new(8);
+	struct World world;
+	struct String filepath = String_new(8);
 
 	// get path
 	if (get_world_path(&filepath) != 0) {
-		world.invalid = true;
+		world.invalid = 1;
 		return world;
 	}
 
-	SM_String_append_cstr(&filepath, world_name);
-	SM_String_append_cstr(&filepath, ".");
-	SM_String_append_cstr(&filepath, FILETYPE_WORLD);
+	String_append_cstr(&filepath, world_name);
+	String_append_cstr(&filepath, ".");
+	String_append_cstr(&filepath, FILETYPE_WORLD);
 
 	// read
-	world = SG_World_from_file(filepath.str);
+	world = World_from_file(filepath.str);
 
 	if (world.invalid) {
-		SM_String msg = SM_String_new(16);
-		SM_String_copy_cstr(&msg, "World \"");
-		SM_String_append_cstr(&msg, world_name);
-		SM_String_append_cstr(&msg, "\" could not be read.");
-		SM_log_err(msg.str);
-		SM_String_clear(&msg);
+		struct String msg = String_new(16);
+		String_copy_cstr(&msg, "World \"");
+		String_append_cstr(&msg, world_name);
+		String_append_cstr(&msg, "\" could not be read.");
+		log_err(msg.str);
+		String_clear(&msg);
 	}
 
-	SM_String_clear(&filepath);
+	String_clear(&filepath);
 	return world;
 }
 
-void World_write(SG_World * world, const char *world_name)
+void Ch_World_to_file(struct World *world, const char *world_name)
 {
-	SM_String filepath = SM_String_new(8);
+	struct String filepath = String_new(8);
 
 	// get path
 	if (get_world_path(&filepath) != 0) {
-		world->invalid = true;
+		world->invalid = 1;
 		return;
 	}
 
-	SM_String_append_cstr(&filepath, world_name);
-	SM_String_append_cstr(&filepath, ".");
-	SM_String_append_cstr(&filepath, FILETYPE_WORLD);
+	String_append_cstr(&filepath, world_name);
+	String_append_cstr(&filepath, ".");
+	String_append_cstr(&filepath, FILETYPE_WORLD);
 
 	// write
-	SG_World_write(world, filepath.str);
+	Ch_World_to_file(world, filepath.str);
 
 	if (world->invalid) {
-		SM_String msg = SM_String_new(16);
-		SM_String_copy_cstr(&msg, "World \"");
-		SM_String_append_cstr(&msg, world_name);
-		SM_String_append_cstr(&msg, "\" could not be read.");
-		SM_log_err(msg.str);
-		SM_String_clear(&msg);
+		struct String msg = String_new(16);
+		String_copy_cstr(&msg, "World \"");
+		String_append_cstr(&msg, world_name);
+		String_append_cstr(&msg, "\" could not be read.");
+		log_err(msg.str);
+		String_clear(&msg);
 	}
 
-	SM_String_clear(&filepath);
+	String_clear(&filepath);
 }

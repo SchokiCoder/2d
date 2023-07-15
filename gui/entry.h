@@ -4,51 +4,54 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef SGUI_ENTRY_H
-#define SGUI_ENTRY_H
+#ifndef _ENTRY_H
+#define _ENTRY_H
 
 #include <stdbool.h>
-#include <SM_types.h>
-#include <SM_string.h>
-#include "SGUI_sprite.h"
 
-typedef struct SGUI_Theme SGUI_Theme;
-typedef struct SGUI_Menu SGUI_Menu;
+#include "sprite.h"
+#include "engine/sstring.h"
+#include "engine/types.h"
 
-#define SGUI_ENTRY_TEXT_INIT_SIZE 32
+struct Theme;
+struct Menu;
 
-typedef struct SGUI_EntryStyle {
+#define ENTRY_TEXT_INIT_SIZE 32
+
+struct EntryStyle {
 	SDL_Color font_color;
 	SDL_Color bg_color;
 	SDL_Color border_color;
 	SDL_Color disabled_color;
-} SGUI_EntryStyle;
+};
 
-typedef struct SGUI_Entry {
-	SGUI_Menu *menu;
+struct Entry {
+	struct Menu *menu;
 	TTF_Font *font;
-	bool visible;
-	bool active;
-	SM_String text;
-	SGUI_Sprite *sprites;
+	int visible;
+	int active;
+	struct String text;
+	struct Sprite *sprites;
 
 	SDL_Rect rect;
-	SGUI_EntryStyle style;
-} SGUI_Entry;
+	struct EntryStyle style;
+};
 
-void SGUI_Entry_new(SGUI_Entry * entry, SGUI_Menu * menu, TTF_Font * font,
-		    const SGUI_EntryStyle style);
+void Entry_new(struct Entry            *entry,
+               struct Menu             *menu,
+               TTF_Font                *font,
+	       const struct EntryStyle  style);
 
-void SGUI_Entry_update_sprite(SGUI_Entry * entry, size_t pos);
+void Entry_update_sprite(struct Entry *entry, size_t pos);
 
-void SGUI_Entry_update_sprites(SGUI_Entry * entry);
+void Entry_update_sprites(struct Entry *entry);
 
-void SGUI_Entry_append(SGUI_Entry * entry, SM_String * appendage);
+void Entry_append(struct Entry *entry, struct String *appendage);
 
-void SGUI_Entry_draw(SGUI_Entry * entry);
+void Entry_draw(struct Entry *entry);
 
-void SGUI_Entry_clear_sprites(SGUI_Entry * entry);
+void Entry_clear_sprites(struct Entry *entry);
 
-void SGUI_Entry_resize(SGUI_Entry * entry);
+void Entry_resize(struct Entry *entry);
 
-#endif				/* SGUI_ENTRY_H */
+#endif				/* _ENTRY_H */

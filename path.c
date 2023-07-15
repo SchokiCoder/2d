@@ -4,38 +4,38 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <sys/stat.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
-#include <SM_log.h>
-#include "app.h"
+#include <sys/stat.h>
+
+#include "engine/log.h"
 #include "path.h"
 
-int32_t get_base_path(SM_String * out)
+i32 get_base_path(struct String *out)
 {
-	int32_t rc;
+	i32 ret;
 
 	// get path
-	SM_String_append_cstr(out, getenv("HOME"));
-	SM_String_append_cstr(out, SLASH);
-	SM_String_append_cstr(out, ".");
-	SM_String_append_cstr(out, APP_NAME);
-	SM_String_append_cstr(out, SLASH);
+	String_append_cstr(out, getenv("HOME"));
+	String_append_cstr(out, SLASH);
+	String_append_cstr(out, ".");
+	String_append_cstr(out, APP_NAME);
+	String_append_cstr(out, SLASH);
 
 	/* in case, create dir */
 	errno = 0;
 
 #ifdef _WIN32
-	rc = mkdir(out->str);
+	ret = mkdir(out->str);
 #else
-	rc = mkdir(out->str, S_IRWXU);
+	ret = mkdir(out->str, S_IRWXU);
 #endif
 
-	if (rc == -1) {
+	if (ret == -1) {
 		if (errno != EEXIST) {
-			SM_log_err("Could not get userfiles path.");
+			log_err("Could not get userfiles path.");
 			return 1;
 		}
 	}
@@ -43,32 +43,32 @@ int32_t get_base_path(SM_String * out)
 	return 0;
 }
 
-int32_t get_world_path(SM_String * out)
+i32 get_world_path(struct String *out)
 {
-	int32_t rc;
+	i32 ret;
 
 	/* get base path */
-	rc = get_base_path(out);
+	ret = get_base_path(out);
 
-	if (rc != 0)
-		return rc;
+	if (ret != 0)
+		return ret;
 
 	/* get path */
-	SM_String_append_cstr(out, PATH_WORLDS);
-	SM_String_append_cstr(out, SLASH);
+	String_append_cstr(out, PATH_WORLDS);
+	String_append_cstr(out, SLASH);
 
 	/* in case, create dir */
 	errno = 0;
 
 #ifdef _WIN32
-	rc = mkdir(out->str);
+	ret = mkdir(out->str);
 #else
-	rc = mkdir(out->str, S_IRWXU);
+	ret = mkdir(out->str, S_IRWXU);
 #endif
 
-	if (rc == -1) {
+	if (ret == -1) {
 		if (errno != EEXIST) {
-			SM_log_err("Could not create worlds directory.");
+			log_err("Could not create worlds directory.");
 			return 1;
 		}
 	}
@@ -76,30 +76,30 @@ int32_t get_world_path(SM_String * out)
 	return 0;
 }
 
-int32_t get_config_path(SM_String * out)
+i32 get_config_path(struct String *out)
 {
-	int32_t rc;
+	i32 ret;
 
 	/* get base path */
-	rc = get_base_path(out);
+	ret = get_base_path(out);
 
-	if (rc != 0)
-		return rc;
+	if (ret != 0)
+		return ret;
 
 	/* get path */
-	SM_String_append_cstr(out, PATH_CONFIG);
+	String_append_cstr(out, PATH_CONFIG);
 
 	return 0;
 }
 
-bool file_check_existence(const char *path)
+int file_check_existence(const char *path)
 {
 	FILE *f = fopen(path, "r");
 
 	if (f == NULL)
-		return false;
+		return 0;
 
 	fclose(f);
 
-	return true;
+	return 1;
 }

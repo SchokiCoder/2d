@@ -1,9 +1,18 @@
 rehab:
 {
-	-finish Makefile			.
-	-fix application name labels		.
-	-fix application version labels		.
+	-finish Makefile			v
+	-fix application metadata		v
+	-fix linker error			v
+	-fix segfault				.
+	-are debug builds actually valid	.
+	 (because o-files are not compiled
+	 with -g or -D _DEBUG)
+	-same ^ for -Os				.
+	-check for other issues			.
+	-set version to 0.1.0			.
 }
+
+--- done ---
 
 refactor:
 remove typedef from struct
@@ -11,6 +20,6 @@ GNU indent messed my pointers up: "muh * ptr"
 bool -> int
 {
 	-engine						v
-	-gui						.
-	-main						.
+	-gui						v
+	-main						v
 }

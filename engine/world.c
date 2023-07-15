@@ -28,7 +28,7 @@ void World_allocate(struct World *world)
 		}
 	}
 
-	world->entities = malloc(world->ent_count *sizeof(Entity));
+	world->entities = malloc(world->ent_count *sizeof(struct Entity));
 }
 
 struct World World_new(const u32 block_size,
@@ -106,7 +106,7 @@ struct World World_from_file(const char *filepath)
 	return world;
 }
 
-void World_write(struct World *world, const char *filepath)
+void World_to_file(struct World *world, const char *filepath)
 {
 	FILE *f;
 

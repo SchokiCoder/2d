@@ -4,20 +4,24 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include <SG_world.h>
-#include <SG_physics.h>
+#include "engine/world.h"
+#include "engine/physics.h"
 #include "entity.h"
 
 /*
 	player_pos: 		player.rect.x or y
 	player_velocity:	player.velocity_x or y
 */
-bool_t Entity_move(SG_Entity * ent, float *pos, float *velocity, float distance,
-		   SG_World * world)
+int
+Entity_move(struct Entity *ent,
+	    f32 *pos,
+	    f32 *velocity,
+	    f32 distance,
+	    struct World *world)
 {
-	bool_t collision = FALSE;
-	int_fast32_t x1, y1, x2, y2;
-	SG_FRect block_hitbox;
+	int collision = 0;
+	i32 x1, y1, x2, y2;
+	struct FRect block_hitbox;
 
 	// set position
 	*pos += distance;
@@ -32,33 +36,33 @@ bool_t Entity_move(SG_Entity * ent, float *pos, float *velocity, float distance,
 	if (x1 < 0)
 		x1 = 0;
 
-	if (x1 > (int_fast32_t) world->width - 1)
-		x1 = (int_fast32_t) world->width - 1;
+	if (x1 > (i32) world->width - 1)
+		x1 = (i32) world->width - 1;
 
 	if (y1 < 0)
 		y1 = 0;
 
-	if (y1 > (int_fast32_t) world->height - 1)
-		y1 = (int_fast32_t) world->height - 1;
+	if (y1 > (i32) world->height - 1)
+		y1 = (i32) world->height - 1;
 
 	if (x2 < 0)
 		x2 = 0;
 
-	if (x2 > (int_fast32_t) world->width - 1)
-		x2 = (int_fast32_t) world->width - 1;
+	if (x2 > (i32) world->width - 1)
+		x2 = (i32) world->width - 1;
 
 	if (y2 < 0)
 		y2 = 0;
 
-	if (y2 > (int_fast32_t) world->height - 1)
-		y2 = (int_fast32_t) world->height - 1;
+	if (y2 > (i32) world->height - 1)
+		y2 = (i32) world->height - 1;
 
 	// collision check for nearby blocks
 	block_hitbox.w = BLOCK_SIZE;
 	block_hitbox.h = BLOCK_SIZE;
 
-	for (int_fast32_t x = x1; x <= x2; x++) {
-		for (int_fast32_t y = y1; y <= y2; y++) {
+	for (i32 x = x1; x <= x2; x++) {
+		for (i32 y = y1; y <= y2; y++) {
 			// if non-solid block here, skip
 			if (world->blocks[x][y][0] == B_NONE)
 				continue;
@@ -67,9 +71,9 @@ bool_t Entity_move(SG_Entity * ent, float *pos, float *velocity, float distance,
 			block_hitbox.y = y * BLOCK_SIZE;
 
 			// if collision
-			if (SG_box_within_box(&ent->rect, &block_hitbox)) {
+			if (frect_within_frect(&ent->rect, &block_hitbox)) {
 				// flag, reset pos, kill velocity
-				collision = TRUE;
+				collision = 1;
 				*pos -= distance;
 				*velocity = 0.0f;
 			}
@@ -79,14 +83,14 @@ bool_t Entity_move(SG_Entity * ent, float *pos, float *velocity, float distance,
 	return collision;
 }
 
-void Entity_move_x(SG_Entity * ent, float x_distance, SG_World * world)
+void Entity_move_x(struct Entity *ent, f32 x_distance, struct World *world)
 {
 	Entity_move(ent, &ent->rect.x, &ent->velocity_x, x_distance, world);
 }
 
-void Entity_move_y(SG_Entity * ent, float y_distance, SG_World * world)
+void Entity_move_y(struct Entity *ent, f32 y_distance, struct World *world)
 {
-	bool_t collision;
+	int collision;
 
 	// move
 	collision =
@@ -94,7 +98,7 @@ void Entity_move_y(SG_Entity * ent, float y_distance, SG_World * world)
 
 	// if falling and collision happened, set grounded, else set non-grounded
 	if (y_distance > 0.0f && collision)
-		ent->grounded = TRUE;
+		ent->grounded = 1;
 	else
-		ent->grounded = FALSE;
+		ent->grounded = 0;
 }

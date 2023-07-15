@@ -9,7 +9,7 @@
 
 #include "types.h"
 
-struct World World;
+struct World;
 
 struct EntityData {
 	char *name;

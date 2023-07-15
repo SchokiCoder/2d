@@ -140,7 +140,7 @@ int Dict_find(const struct Dict *dict, const char *key, usize *index)
 	return 0;
 }
 
-int Dict_write(const struct Dict *dict, const char *filepath)
+int Dict_to_file(const struct Dict *dict, const char *filepath)
 {
 	FILE *f;
 

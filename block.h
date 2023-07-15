@@ -4,20 +4,20 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef BLOCK_H
-#define BLOCK_H
+#ifndef _CH_BLOCK_H
+#define _CH_BLOCK_H
 
-#include <stdint.h>
+#include "engine/types.h"
 
-static const int_fast32_t BLOCK_SIZE = 32;
+static const i32 BLOCK_SIZE = 32;
 
-typedef enum Block {
+enum Blocks {
 	B_NONE,
 	B_DIRT,
 	B_STONE,
 
 	B_FIRST = B_NONE,
-	B_LAST = B_STONE,
-} Block;
+	B_LAST = B_STONE
+};
 
-#endif				/* BLOCK_H */
+#endif				/* _CH_BLOCK_H */

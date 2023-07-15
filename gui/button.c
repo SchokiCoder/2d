@@ -4,17 +4,19 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#include "SGUI_theme.h"
-#include "SGUI_menu.h"
-#include "SGUI_button.h"
+#include "button.h"
+#include "menu.h"
+#include "theme.h"
 
-void SGUI_Button_new(SGUI_Button * button, SGUI_Menu * menu, TTF_Font * font,
-		     const SGUI_ButtonStyle style)
+void Button_new(struct Button *button,
+		struct Menu *menu,
+		TTF_Font *font,
+		const struct ButtonStyle style)
 {
 	button->menu = menu;
 	button->font = font;
-	button->text = SM_String_new(SGUI_BUTTON_TEXT_INIT_SIZE);
-	button->sprite = SGUI_Sprite_new();
+	button->text = String_new(BUTTON_TEXT_INIT_SIZE);
+	button->sprite = Sprite_new();
 	button->visible = true;
 	button->active = true;
 	button->style = style;
@@ -25,16 +27,16 @@ void SGUI_Button_new(SGUI_Button * button, SGUI_Menu * menu, TTF_Font * font,
 	menu->button_count++;
 }
 
-void SGUI_Button_update_sprite(SGUI_Button * button)
+void Button_update_sprite(struct Button *button)
 {
-	SGUI_Sprite_clear(&button->sprite);
-	button->sprite = SGUI_Sprite_from_text(button->menu->renderer,
-					       button->text.str,
-					       button->font,
-					       button->style.font_color);
+	Sprite_clear(&button->sprite);
+	button->sprite = Sprite_from_text(button->menu->renderer,
+					  button->text.str,
+					  button->font,
+					  button->style.font_color);
 }
 
-void SGUI_Button_draw(SGUI_Button * button)
+void Button_draw(struct Button *button)
 {
 	// draw bg
 	SDL_SetRenderDrawColor(button->menu->renderer,
@@ -67,7 +69,7 @@ void SGUI_Button_draw(SGUI_Button * button)
 	}
 }
 
-void SGUI_Button_resize(SGUI_Button * button)
+void Button_resize(struct Button *button)
 {
 	button->rect.w = button->sprite.surface->w;
 	button->rect.h = button->sprite.surface->h;

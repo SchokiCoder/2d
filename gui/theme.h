@@ -4,20 +4,21 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef SGUI_THEME_H
-#define SGUI_THEME_H
+#ifndef _THEME_H
+#define _THEME_H
 
 #include <SDL_pixels.h>
-#include "SGUI_menu.h"
-#include "SGUI_label.h"
-#include "SGUI_button.h"
-#include "SGUI_entry.h"
 
-typedef struct SGUI_Theme {
-	SGUI_MenuStyle menu;
-	SGUI_LabelStyle label;
-	SGUI_ButtonStyle button;
-	SGUI_EntryStyle entry;
-} SGUI_Theme;
+#include "button.h"
+#include "entry.h"
+#include "label.h"
+#include "menu.h"
 
-#endif				/* SGUI_THEME_H */
+struct Theme {
+	struct MenuStyle menu;
+	struct LabelStyle label;
+	struct ButtonStyle button;
+	struct EntryStyle entry;
+};
+
+#endif				/* _THEME_H */

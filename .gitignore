@@ -1,4 +1,6 @@
-/*.o
-/*/*.o
-/chemarium
-/chemarium_d
+*.o
+gui/*.o
+engine/*.o
+chemarium
+chemarium_d
+log.txt

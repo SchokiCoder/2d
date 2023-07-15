@@ -31,7 +31,7 @@ void Dict_add(struct Dict *dict, const char *restrict key, const char *restrict 
 
 int Dict_find(const struct Dict *dict, const char *key, usize *index);
 
-int Dict_write(const struct Dict *dict, const char *filepath);
+int Dict_to_file(const struct Dict *dict, const char *filepath);
 
 void Dict_clear(struct Dict *dict);
 

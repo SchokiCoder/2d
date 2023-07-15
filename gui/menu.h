@@ -4,54 +4,54 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef SGUI_MENU_H
-#define SGUI_MENU_H
+#ifndef _MENU_H
+#define _MENU_H
 
-#include <stdbool.h>
-#include <SM_types.h>
+#include <SDL_pixels.h>
 #include <SDL_render.h>
 #include <SDL_ttf.h>
-#include <SDL_pixels.h>
 
-typedef struct SGUI_Theme SGUI_Theme;
-typedef struct SGUI_Label SGUI_Label;
-typedef struct SGUI_Button SGUI_Button;
-typedef struct SGUI_Entry SGUI_Entry;
+#include "engine/types.h"
 
-#define SGUI_MENU_MAX_WIDGETS 16	/* per type */
+struct Theme;
+struct Label;
+struct Button;
+struct Entry;
 
-typedef struct SGUI_MenuStyle {
+#define MENU_MAX_WIDGETS 16	/* per type */
+
+struct MenuStyle {
 	SDL_Color bg_color;
-} SGUI_MenuStyle;
+};
 
-typedef struct SGUI_Menu {
+struct Menu {
 	SDL_Renderer *renderer;
 
-	bool visible;
-	bool active;
+	int visible;
+	int active;
 
 	u8 label_count;
-	SGUI_Label *labels[SGUI_MENU_MAX_WIDGETS];
+	struct Label *labels[MENU_MAX_WIDGETS];
 
 	u8 button_count;
-	SGUI_Button *buttons[SGUI_MENU_MAX_WIDGETS];
+	struct Button *buttons[MENU_MAX_WIDGETS];
 
 	u8 entry_count;
-	SGUI_Entry *entries[SGUI_MENU_MAX_WIDGETS];
-	SGUI_Entry *focused_entry;
+	struct Entry *entries[MENU_MAX_WIDGETS];
+	struct Entry *focused_entry;
 
 	SDL_Rect rect;
-	SGUI_MenuStyle style;
-} SGUI_Menu;
+	struct MenuStyle style;
+};
 
-SGUI_Menu SGUI_Menu_new(SDL_Renderer * renderer, const SGUI_MenuStyle style);
+struct Menu Menu_new(SDL_Renderer *renderer, const struct MenuStyle style);
 
-void SGUI_Menu_draw(SGUI_Menu * menu);
+void Menu_draw(struct Menu *menu);
 
-void SGUI_Menu_handle_event(SGUI_Menu * menu, SDL_Event * event);
+void Menu_handle_event(struct Menu *menu, SDL_Event *event);
 
-void SGUI_Menu_grid(SGUI_Menu * menu);
+void Menu_grid(struct Menu *menu);
 
-void SGUI_Menu_clear(SGUI_Menu * menu);
+void Menu_clear(struct Menu *menu);
 
-#endif				/* SGUI_MENU_H */
+#endif				/* _MENU_H */

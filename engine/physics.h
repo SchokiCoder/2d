@@ -7,12 +7,10 @@
 #ifndef _PHYSICS_H
 #define _PHYSICS_H
 
-#include "types.h"
-
-struct FPoint FPoint;
-struct IPoint IPoint;
-struct FRect FRect;
-struct IRect IRect;
+struct FPoint;
+struct IPoint;
+struct FRect;
+struct IRect;
 
 int fpoint_within_frect(struct FPoint *pt, struct FRect *rect);
 

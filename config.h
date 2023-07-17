@@ -33,8 +33,8 @@ struct Config {
 
 struct Config Config_new(void);
 
-void Config_load(struct Config *cfg);
+void Config_from_file(struct Config *cfg);
 
-void Config_save(struct Config *cfg);
+void Config_to_file(struct Config *cfg);
 
 #endif				/* _CH_CONFIG_H */

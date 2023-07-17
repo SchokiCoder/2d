@@ -26,6 +26,8 @@ CC=cc
 INCLUDE=-I . -I /usr/include/SDL2
 LIBS=-l SDL2 -l SDL2_image -l SDL2_ttf
 CFLAGS=-std=c99 -Wall -Wextra $(INCLUDE) $(LIBS) $(DEFINES)
+REL_CFLAGS=$(CFLAGS) -Os
+DEB_CFLAGS=$(CFLAGS) -g -D _DEBUG
 
 TARGETS_GUI=gui/sprite.o \
 	gui/entry.o \
@@ -42,59 +44,61 @@ TARGETS_ENGINE=engine/dict.o \
 TARGETS=$(TARGETS_ENGINE) $(TARGETS_GUI) \
 	world.o path.o main.o game.o entity.o config.o
 
-chemarium: $(TARGETS)
-	$(CC) $(CFLAGS) -Os -o $@ $^
+# the difference between this and chemarium_d sucks but it works for now
+chemarium: *.c engine/*.c gui/*.c
+	$(CC) $(REL_CFLAGS) -o $@ $^
 
+# this is built more often, so it gets the speed improvement
 chemarium_d: $(TARGETS)
-	$(CC) $(CFLAGS) -g -D _DEBUG -o $@ $^
+	$(CC) $(DEB_CFLAGS) -o $@ $^
 
 config.o: config.c config.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 entity.o: entity.c entity.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 game.o: game.c game.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 main.o: main.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 path.o: path.c path.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 world.o: world.c world.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 gui/menu.o: gui/menu.c gui/menu.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 gui/label.o: gui/label.c gui/label.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 gui/button.o: gui/button.c gui/button.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 gui/entry.o: gui/entry.c gui/entry.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 gui/sprite.o: gui/sprite.c gui/sprite.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 engine/world.o: engine/world.c engine/world.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 engine/physics.o: engine/physics.c engine/physics.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 engine/log.o: engine/log.c engine/log.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 engine/sstring.o: engine/sstring.c engine/sstring.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 engine/dict.o: engine/dict.c engine/dict.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(DEB_CFLAGS) -c -o $@ $<
 
 clean:
 	rm -f $(TARGETS)

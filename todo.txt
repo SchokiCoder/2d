@@ -1,13 +1,52 @@
+movement:
+{
+	-add crouching							.
+	-add crouch slide						.
+}
+
+renaissance:
+{
+	-remove dep SDL2_ttf						.
+	-add image fontmap						.
+	 monospcae, utf-8, no rgb image
+	 represent ALL characters as filled square except:
+	 latin characters, numbers, common special chars ,;.:-_ etc
+	 (by including all utf-8 characters we can iterate
+	  through the parsed data with the actual character like 'a')
+
+	-c2								.
+	
+	-remove block-based world building				.
+	-add images as maps						.
+	 In this case, i think a hotswap system for quickly changing
+	 maps is needed. So that developing a map as a picture can be
+	 easily cut into multiple pictures.
+	 Maybe a trigger could be named via a layer name of a XCF-file.
+	 Those layers could then be given behavior with a LUA script.
+	 A layer could also just be a static thing and in the extending
+	 LUA file properties could be given such as "is a liquid" or
+	 "not solid".
+	 In a lua file you could assign the existing layernames an
+	 actual purpose.
+	 Or maybe JSON-file?
+}
+
 rehab:
 {
 	-finish Makefile			v
 	-fix application metadata		v
 	-fix linker error			v
-	-fix segfault				.
-	-are debug builds actually valid	.
+	-Config_save -> Config_to_file		v
+	-are debug builds actually valid	v
 	 (because o-files are not compiled
 	 with -g or -D _DEBUG)
-	-same ^ for -Os				.
+	-same ^ for -Os				v
+	-fix segfault				v
+	 this is due to not finding the font
+	 (has no NULL check lol)
+	 actual fix postponed due to obsolesence
+	-double free on game start		v
+	-cc license the textures		.
 	-check for other issues			.
 	-set version to 0.1.0			.
 }

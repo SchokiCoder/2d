@@ -400,7 +400,7 @@ int main()
 		goto main_clear;
 	}
 	// load config
-	Config_load(&cfg);
+	Config_from_file(&cfg);
 
 	// parse config values
 	int window_mode = SDL_WINDOW_SHOWN;
@@ -423,7 +423,7 @@ int main()
 	}
 	// load font
 	font = TTF_OpenFont(
-		"/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+		"/usr/share/fonts/liberation-mono/LiberationMono-Regular.ttf",
 		FONT_SIZE);
 
 	// create window title
@@ -820,7 +820,7 @@ int main()
 	}
 
 	// save config
-	Config_save(&cfg);
+	Config_to_file(&cfg);
 
  main_clear:
 

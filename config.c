@@ -23,7 +23,7 @@ struct Config Config_new(void)
 	return cfg;
 }
 
-void Config_load(struct Config *cfg)
+void Config_from_file(struct Config *cfg)
 {
 	struct String filepath = String_new(16);
 	struct String msg = String_new(1);
@@ -85,7 +85,7 @@ void Config_load(struct Config *cfg)
 	Dict_clear(&dict);
 }
 
-void Config_save(struct Config *cfg)
+void Config_to_file(struct Config *cfg)
 {
 	struct String filepath = String_new(16);
 

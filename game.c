@@ -30,30 +30,30 @@ static const char *PATH_TEXTURES_ENTITIES[] = {
 static const f32 TIMESCALE = 1.0f;
 
 #ifdef _DEBUG
-static const Theme THEME_DEBUG = {
+static const struct Theme THEME_DEBUG = {
 	.menu = {
 		 .bg_color = {.r = 155,.g = 219,.b = 245,.a = 0},
-		 },
+	},
 
 	.label = {
 		  .font_color = {.r = 255,.g = 0,.b = 255,.a = 255},
 		  .bg_color = {.r = 0,.g = 0,.b = 0,.a = 20},
 		  .border_color = {.r = 0,.g = 0,.b = 0,.a = 0},
-		  },
+	},
 
 	.button = {
 		   .font_color = {.r = 50,.g = 50,.b = 50,.a = 255},
 		   .bg_color = {.r = 0,.g = 0,.b = 0,.a = 25},
 		   .border_color = {.r = 0,.g = 0,.b = 0,.a = 0},
 		   .disabled_color = {.r = 0,.g = 0,.b = 0,.a = 50},
-		   },
+	},
 
 	.entry = {
 		  .font_color = {.r = 0,.g = 0,.b = 0,.a = 255},
 		  .bg_color = {.r = 240,.g = 240,.b = 240,.a = 255},
 		  .border_color = {.r = 0,.g = 0,.b = 0,.a = 255},
 		  .disabled_color = {.r = 0,.g = 0,.b = 0,.a = 50},
-		  },
+	},
 };
 #endif
 
@@ -91,9 +91,13 @@ void Game_setup(struct Game *game)
 	game->world = World_from_file(game->world_name);
 
 	if (game->world.invalid) {
+		String_copy_cstr(&game->msg, "World ");
+		String_append_cstr(&game->msg, game->world_name);
+		String_append_cstr(&game->msg, "is not valid.");
 		Game_clear(game);
 		return;
 	}
+	
 	// load block sprites
 	for (u32 i = 1; i <= B_LAST; i++) {
 		game->spr_blocks[i] =
@@ -103,9 +107,9 @@ void Game_setup(struct Game *game)
 		if (game->spr_blocks[i].invalid) {
 			String_copy_cstr(&game->msg, "Sprite ");
 			String_append_cstr(&game->msg,
-					      PATH_TEXTURES_BLOCKS[i - 1]);
+					   PATH_TEXTURES_BLOCKS[i - 1]);
 			String_append_cstr(&game->msg,
-					      " could not be loaded.");
+					   " could not be loaded.");
 
 			log_err(game->msg.str);
 			Game_clear(game);
@@ -128,8 +132,8 @@ void Game_setup(struct Game *game)
 
 		// check sprite
 		if (game->spr_walls[i].invalid) {
-			log_err
-			    ("Wall-sprite could not be generated from block-sprite.");
+			log_err("Wall-sprite could not be generated from "
+				"block-sprite.");
 			Game_clear(game);
 			return;
 		}
@@ -144,9 +148,9 @@ void Game_setup(struct Game *game)
 		if (game->spr_ents[i].invalid) {
 			String_copy_cstr(&game->msg, "Sprite ");
 			String_append_cstr(&game->msg,
-					      PATH_TEXTURES_ENTITIES[i - 1]);
+					   PATH_TEXTURES_ENTITIES[i - 1]);
 			String_append_cstr(&game->msg,
-					      " could not be loaded.");
+					   " could not be loaded.");
 
 			log_err(game->msg.str);
 			Game_clear(game);
@@ -195,6 +199,10 @@ void Game_run(struct Game *game)
 
 	// setup
 	Game_setup(game);
+	
+	if (game->world.invalid) {
+		return;
+	}
 
 	// set 1st player of world as player
 	for (size_t i = 0; i < game->world.ent_count; i++)
@@ -214,7 +222,7 @@ void Game_run(struct Game *game)
 #ifdef _DEBUG
 	// load font
 	font =
-	    TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",
+	    TTF_OpenFont("/usr/share/fonts/liberation-mono/LiberationMono-Regular.ttf",
 			 16);
 
 	// make debug values menu
@@ -567,8 +575,13 @@ void Game_edit(struct Game *game, const size_t width, const size_t height)
 
 		World_clear(&game->world);
 	}
+	
 	// setup
 	Game_setup(game);
+	
+	if (game->world.invalid) {
+		return;
+	}
 
 	// mainloop
 	while (game->active) {

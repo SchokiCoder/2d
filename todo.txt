@@ -6,24 +6,38 @@ movement:
 
 old problems (from c):
 {
-	-motd is bugged				.
-	-unused variable warnings		.
+	-motd is bugged							.
+	-unused variable warnings					.
+	 (most likely because of -c flag oriented compilation)
 }
 
 renaissance:
 {
-	-remove dep SDL2_ttf						.
-	-add image fontmap						.
+	-c2								.
+
+	-image to world conversion					.
+	 Each pixel is a block.
+	 1)   Draw image                        PNG
+	 2.1) Assign color codes to block id's  JSON
+	 2.2) Set entities                      JSON
+	 3)   Compile                           Compiler "Oven"
+
+	-set version to 0.1.0						.
+}
+
+--- done ---
+
+canceled:
+{
+	-add image fontmap						x
 	 monospcae, utf-8, no rgb image
 	 represent ALL characters as filled square except:
 	 latin characters, numbers, common special chars ,;.:-_ etc
 	 (by including all utf-8 characters we can iterate
 	  through the parsed data with the actual character like 'a')
 
-	-c2								.
-	
-	-remove block-based world building				.
-	-add images as maps						.
+	-remove block-based world building				x
+	 add images as maps						
 	 In this case, i think a hotswap system for quickly changing
 	 maps is needed. So that developing a map as a picture can be
 	 easily cut into multiple pictures.
@@ -36,10 +50,9 @@ renaissance:
 	 actual purpose.
 	 Or maybe JSON-file?
 
-	-set version to 0.1.0						.
+	 removing block based maps is not going work
+	 (without replacing by something very complex)
 }
-
---- done ---
 
 rehab:
 {

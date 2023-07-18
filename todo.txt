@@ -4,6 +4,12 @@ movement:
 	-add crouch slide						.
 }
 
+old problems (from c):
+{
+	-motd is bugged				.
+	-unused variable warnings		.
+}
+
 renaissance:
 {
 	-remove dep SDL2_ttf						.
@@ -29,7 +35,11 @@ renaissance:
 	 In a lua file you could assign the existing layernames an
 	 actual purpose.
 	 Or maybe JSON-file?
+
+	-set version to 0.1.0						.
 }
+
+--- done ---
 
 rehab:
 {
@@ -46,12 +56,8 @@ rehab:
 	 (has no NULL check lol)
 	 actual fix postponed due to obsolesence
 	-double free on game start		v
-	-cc license the textures		.
-	-check for other issues			.
-	-set version to 0.1.0			.
+	-add cc sa license to assets		v
 }
-
---- done ---
 
 refactor:
 remove typedef from struct

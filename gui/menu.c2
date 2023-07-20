@@ -1,0 +1,315 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+module menu;
+
+import sdl;
+
+import button;
+import entry;
+import label;
+import sstring local;
+import theme;
+
+const u32 MAX_WIDGETS = 16;	/* per type */
+
+type MenuStyle struct {
+	sdl.Color bg_color;
+}
+
+type Menu struct {
+	sdl.Renderer*        renderer;
+
+	bool                 visible;
+	bool                 active;
+
+	u8                   label_count;
+	Label*[MAX_WIDGETS]  labels;
+
+	u8                   button_count;
+	Button*[MAX_WIDGETS] buttons;
+
+	u8                   entry_count;
+	Entry*[MAX_WIDGETS]  entries;
+	Entry*               focused_entry;
+		      
+	sdl.Rect             rect;
+	MenuStyle            style;
+}
+
+func Menu new(sdl.Renderer* renderer, const MenuStyle style)
+{
+	Menu ret = {
+		.renderer = renderer,
+		.label_count = 0,
+		.button_count = 0,
+		.entry_count = 0,
+		.focused_entry = NULL,
+		.visible = true,
+		.active = true,
+		.style = style
+	}
+
+	return ret;
+}
+
+func void Menu.draw(const Menu* menu)
+{
+	// stop if not visible
+	if (menu.visible == false)
+		return;
+
+	// draw bg
+	menu.renderer.setDrawColor(menu.style.bg_color.r,
+			menu.style.bg_color.g,
+			menu.style.bg_color.b,
+			menu.style.bg_color.a);
+	menu.renderer.fillRect(&menu.rect);
+
+	// draw labels
+	for (u8 i = 0; i < menu.label_count; i++) {
+		if (menu.labels[i].visible) {
+			menu.labels[i].draw();
+		}
+	}
+
+	// draw buttons
+	for (u8 i = 0; i < menu.button_count; i++) {
+		if (menu.buttons[i].visible) {
+			menu.buttons[i].draw();
+		}
+	}
+
+	// draw entries
+	for (u8 i = 0; i < menu.entry_count; i++) {
+		if (menu.entries[i].visible) {
+			menu.entries[i].draw();
+		}
+	}
+}
+
+func void Menu.handleEvent(Menu* menu, sdl.Event* event)
+{
+	sdl.Point mouse;
+
+	// stop if not visible or not active
+	if (menu.visible == false || menu.active == false)
+		return;
+
+	// handle current event
+	switch (event.eventType) {
+	case sdl.MOUSEBUTTONUP:
+
+		// get mouse coords
+		sdl.getMouseState(&mouse.x, &mouse.y);
+
+		// check buttons
+		for (u8 i = 0; i < menu.button_count; i++) {
+			// if not visible or not active or no event-function stored, skip
+			if (menu.buttons[i].visible == false ||
+			    menu.buttons[i].active == false ||
+			    menu.buttons[i].func_click == NULL)
+				continue;
+
+			// if mouse hit button
+			if (sdl.pointInRect(&mouse, &menu.buttons[i].rect)) {
+				// execute event-function, stop
+				menu.buttons[i].func_click(menu.buttons[i].
+							     data_click);
+				return;
+			}
+		}
+
+		// check entries
+		for (u8 i = 0; i < menu.entry_count; i++) {
+			// if not visible or not active, skip
+			if (menu.entries[i].visible == false ||
+			    menu.entries[i].active == false)
+				continue;
+
+			// if mouse hit entry
+			if (sdl.pointInRect(&mouse, &menu.entries[i].rect)) {
+				// mark entry as focused, stop
+				menu.focused_entry = menu.entries[i];
+				return;
+			}
+		}
+		break;
+
+	case sdl.TEXTINPUT:
+
+		// if menu has a focused entry
+		if (menu.focused_entry != NULL) {
+			// add new characters
+			sstring.String new = sstring.contain(event.text.text);
+			menu.focused_entry.append(&new);
+		}
+		break;
+
+	case sdl.KEYDOWN:
+
+		// if menu has a focused entry
+		if (menu.focused_entry != NULL) {
+			// backspace
+			if (event.key.keysym.sym == sdl.K_BACKSPACE) {
+				if (menu.focused_entry.text.len > 0) {
+					menu.focused_entry.text.str[menu.
+								      focused_entry.
+								      text.len -
+								      1] = '\0';
+					menu.focused_entry.text.len--;
+				}
+			}
+		}
+
+		break;
+	}
+}
+
+type WidgetType enum u32 {
+	None,
+	Label,
+	Button,
+	Entry,
+}
+
+type WidgetPointer union {
+	Label*  label;
+	Button* button;
+	Entry*  entry;
+}
+
+type WidgetReference struct {
+	WidgetType wtype;
+	WidgetPointer ptr;
+}
+
+type CellData struct {
+	WidgetReference wref;
+	u32 width;
+	u32 height;
+}
+
+func void Menu.grid(Menu* menu)
+{
+	const usize TABLE_W = 256;
+	const usize TABLE_H = 256;
+
+	CellData[TABLE_W][TABLE_H] table;
+	u32[TABLE_W] colwidth;
+	u32[TABLE_H] rowheight;
+
+	// init table
+	for (usize x = 0; x < TABLE_W; x++) {
+		for (usize y = 0; y < TABLE_H; y++) {
+			table[x][y].wref.wtype = WidgetType.None;
+			table[x][y].wref.ptr.label = NULL;
+			table[x][y].width = 0;
+			table[x][y].height = 0;
+		}
+	}
+
+	// assign widgets to cells
+	sdl.Point tblpt;
+
+	for (u8 i = 0; i < menu.label_count; i++) {
+		tblpt.x = menu.labels[i].rect.x;
+		tblpt.y = menu.labels[i].rect.y;
+
+		table[tblpt.x][tblpt.y].wref.wtype = WidgetType.Label;
+		table[tblpt.x][tblpt.y].wref.ptr.label = menu.labels[i];
+		table[tblpt.x][tblpt.y].width = menu.labels[i].rect.w;
+		table[tblpt.x][tblpt.y].height = menu.labels[i].rect.h;
+	}
+
+	for (u8 i = 0; i < menu.button_count; i++) {
+		tblpt.x = menu.buttons[i].rect.x;
+		tblpt.y = menu.buttons[i].rect.y;
+
+		table[tblpt.x][tblpt.y].wref.wtype = WidgetType.Button;
+		table[tblpt.x][tblpt.y].wref.ptr.button = menu.buttons[i];
+		table[tblpt.x][tblpt.y].width = menu.buttons[i].rect.w;
+		table[tblpt.x][tblpt.y].height = menu.buttons[i].rect.h;
+	}
+
+	for (u8 i = 0; i < menu.entry_count; i++) {
+		tblpt.x = menu.entries[i].rect.x;
+		tblpt.y = menu.entries[i].rect.y;
+
+		table[tblpt.x][tblpt.y].wref.wtype = WidgetType.Entry;
+		table[tblpt.x][tblpt.y].wref.ptr.entry = menu.entries[i];
+		table[tblpt.x][tblpt.y].width = menu.entries[i].rect.w;
+		table[tblpt.x][tblpt.y].height = menu.entries[i].rect.h;
+	}
+
+	// get col width, row height
+	for (usize x = 0; x < TABLE_W; x++) {
+		for (usize y = 0; y < TABLE_H; y++) {
+			// if cell has no content, skip
+			if (table[x][y].wref.wtype == WidgetType.None)
+				continue;
+
+			// if needed, increase size
+			if (table[x][y].width > colwidth[x])
+				colwidth[x] = table[x][y].width;
+
+			if (table[x][y].height > rowheight[y])
+				rowheight[y] = table[x][y].height;
+		}
+	}
+
+	// change pos of widgets
+	u32 pos_x = 0;
+	u32 pos_y = 0;
+
+	for (usize x = 0; x < TABLE_W; x++) {
+		for (usize y = 0; y < TABLE_H; y++) {
+			switch (table[x][y].wref.wtype) {
+			case Label:
+				table[x][y].wref.ptr.label.rect.x = pos_x;
+				table[x][y].wref.ptr.label.rect.y = pos_y;
+				break;
+
+			case Button:
+				table[x][y].wref.ptr.button.rect.x = pos_x;
+				table[x][y].wref.ptr.button.rect.y = pos_y;
+				break;
+
+			case Entry:
+				table[x][y].wref.ptr.entry.rect.x = pos_x;
+				table[x][y].wref.ptr.entry.rect.y = pos_y;
+				break;
+
+			case None:
+			default:
+				break;
+			}
+
+			pos_y += rowheight[y];
+		}
+
+		pos_y = 0;
+		pos_x += colwidth[x];
+	}
+}
+
+func void Menu.free(Menu* menu)
+{
+	for (u8 i = 0; i < menu.label_count; i++) {
+		menu.labels[i].sprite.free();
+		menu.labels[i].text.free();
+	}
+
+	for (u8 i = 0; i < menu.button_count; i++) {
+		menu.buttons[i].sprite.free();
+		menu.buttons[i].text.free();
+	}
+
+	for (u8 i = 0; i < menu.entry_count; i++) {
+		menu.entries[i].freeSprites();
+		menu.entries[i].text.free();
+	}
+}

@@ -1,0 +1,80 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+module label;
+
+import menu;
+import sprite local;
+import sstring local;
+import theme;
+
+const u32 TEXT_INIT_SIZE = 32;
+
+type LabelStyle struct {
+	sdl.Color font_color;
+	sdl.Color bg_color;
+	sdl.Color border_color;
+}
+
+type Label struct {
+	Menu*      menu;
+	ttf.Font*  font;
+	bool       visible;
+	String     text;
+	Sprite     sprite;
+		   
+	SDL_Rect   rect;
+	LabelStyle style;
+}
+
+func void
+Label.init(Label* label, Menu* menu, ttf.Font* font, const LabelStyle style)
+{
+	label.menu = menu;
+	label.font = font;
+	label.text = newString(TEXT_INIT_SIZE);
+	label.sprite = newSprite();
+	label.visible = true;
+	label.style = style;
+
+	menu.labels[menu.label_count] = label;
+	menu.label_count++;
+}
+
+func void Label.updateSprite(Label* label)
+{
+	label.sprite.free();
+	label.sprite = newSpriteFromText(label.menu.renderer,
+			label.text.str,
+			label.font,
+			label.style.font_color);
+}
+
+func void Label.draw(Label* label)
+{
+	// draw bg
+	label.menu.renderer.setDrawColor(label.style.bg_color.r,
+			       label.style.bg_color.g,
+			       label.style.bg_color.b,
+			       label.style.bg_color.a);
+	label.menu.renderer.fillRect(&label.rect);
+
+	// draw border
+	label.menu.renderer.setDrawColor(label.style.border_color.r,
+			label.style.border_color.g,
+			label.style.border_color.b,
+			label.style.border_color.a);
+	label.menu.renderer.drawRect(&label.rect);
+
+	// draw text
+	label.menu.renderer.copy(label.sprite.texture, NULL, &label.rect);
+}
+
+func void Label.resize(Label* label)
+{
+	label.rect.w = label.sprite.surface.w;
+	label.rect.h = label.sprite.surface.h;
+}

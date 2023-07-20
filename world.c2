@@ -1,0 +1,93 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+module ch_world;
+
+import stdio;
+
+import ch_block;
+import ch_entity local;
+import ch_path;
+import log;
+import sstring;
+import world;
+
+func world.World new(const size width, const size height)
+{
+	world.World ret = world.new(block.SIZE, width, height, 2);
+
+	// set values
+	ret.entities[0].id = E_PLAYER;
+	ret.entities[0].rect.x = 0.0;
+	ret.entities[0].rect.y = 0.0;
+	ret.entities[0].rect.w = ch_entity.DATA[E_PLAYER].width;
+	ret.entities[0].rect.h = ch_entity.DATA[E_PLAYER].height;
+	ret.entities[0].grounded = false;
+	ret.entities[0].velocity_x = 0.0;
+	ret.entities[0].velocity_y = 0.0;
+
+	return ret;
+}
+
+func world.World fromFile(const char* world_name)
+{
+	World ret;
+	sstring.String filepath = sstring.new(8);
+
+	// get path
+	if (get_world_path(&filepath) != 0) {
+		ret.invalid = true;
+		return ret;
+	}
+
+	filepath.appendFromCstr(world_name);
+	filepath.appendFromCstr(".");
+	filepath.appendFromCstr(FILETYPE_WORLD);
+
+	// read
+	ret = world.fromFile(filepath.str);
+
+	if (ret.invalid) {
+		sstring.String msg = sstring.new(16);
+		msg.copyFromCstr("World \"");
+		msg.appendFromCstr(world_name);
+		msg.appendFromCstr("\" could not be read.");
+		log_err(msg.str);
+		msg.free();
+	}
+
+	filepath.free();
+	return ret;
+}
+
+func void World.chToFile(World* wld, const char* world_name)
+{
+	sstring.String filepath = sstring.new(8);
+
+	// get path
+	if (get_world_path(&filepath) != 0) {
+		world.invalid = true;
+		return;
+	}
+
+	filepath.appendFromCstr(world_name);
+	filepath.appendFromCstr(".");
+	filepath.appendFromCstr(FILETYPE_WORLD);
+
+	// write
+	wld.toFile(filepath.str);
+
+	if (wld.invalid) {
+		sstring.String msg = sstring.new(16);
+		msg.copyFromCstr("World \"");
+		msg.appendFromCstr(world_name);
+		msg.appendFromCstr("\" could not be read.");
+		log_err(msg.str);
+		msg.free();
+	}
+
+	filepath.free();
+}

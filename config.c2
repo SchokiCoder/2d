@@ -1,0 +1,144 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+module ch_config;
+
+import ch_path;
+import dict;
+import log;
+import sstring;
+
+const char* NAME_GFX_WINDOW_X = "gfx_window_x";
+const char* NAME_GFX_WINDOW_Y = "gfx_window_y";
+const char* NAME_GFX_WINDOW_W = "gfx_window_w";
+const char* NAME_GFX_WINDOW_H = "gfx_window_h";
+const char* NAME_GFX_WINDOW_FULLSCREEN = "gfx_window_fullscreen";
+
+const u32 STD_GFX_WINDOW_X = SDL_WINDOWPOS_CENTERED;
+const u32 STD_GFX_WINDOW_Y = SDL_WINDOWPOS_CENTERED;
+const f32 STD_GFX_WINDOW_W = 640.0;
+const f32 STD_GFX_WINDOW_H = 480.0;
+const bool STD_GFX_WINDOW_FULLSCREEN = false;
+
+type Config struct {
+	bool invalid;
+	i32  gfx_window_x;
+	i32  gfx_window_y;
+	i32  gfx_window_w;
+	i32  gfx_window_h;
+	bool gfx_window_fullscreen;
+}
+
+func Config new()
+{
+	Config ret = {
+		.invalid = 0,
+		.gfx_window_x = STD_GFX_WINDOW_X,
+		.gfx_window_y = STD_GFX_WINDOW_Y,
+		.gfx_window_w = STD_GFX_WINDOW_W,
+		.gfx_window_h = STD_GFX_WINDOW_H,
+		.gfx_window_fullscreen = STD_GFX_WINDOW_FULLSCREEN,
+	}
+
+	return ret;
+}
+
+func void Config.fromFile(Config* cfg)
+{
+	sstring.String filepath = sstring.new(16);
+	sstring.String msg = sstring.new(1);
+
+	// get path
+	if (get_config_path(&filepath) != 0) {
+		filepath.free();
+		cfg.invalid = true;
+		return;
+	}
+
+	// read file
+	Dict content = dict.fromFile(filepath.str);
+
+	if (content.invalid) {
+		filepath.free();
+		cfg.invalid = true;
+		log_warn("Config could not be loaded.");
+		return;
+	}
+
+	// convert dict into config
+	for (usize i = 0; i < content.len; i++) {
+		// window pos, size
+		if (strequal(content.data[i].key.str, NAME_GFX_WINDOW_X))
+			cfg.gfx_window_x =
+			    strtol(content.data[i].value.str, NULL, 10);
+
+		else if (strequal
+			 (content.data[i].key.str, NAME_GFX_WINDOW_Y))
+			cfg.gfx_window_y =
+			    strtol(content.data[i].value.str, NULL, 10);
+
+		else if (strequal
+			 (content.data[i].key.str, NAME_GFX_WINDOW_W))
+			cfg.gfx_window_w =
+			    strtol(content.data[i].value.str, NULL, 10);
+
+		else if (strequal
+			 (content.data[i].key.str, NAME_GFX_WINDOW_H))
+			cfg.gfx_window_h =
+			    strtol(content.data[i].value.str, NULL, 10);
+
+		else if (strequal
+			 (content.data[i].key.str,
+			  NAME_GFX_WINDOW_FULLSCREEN))
+			cfg.gfx_window_fullscreen =
+			    strtol(content.data[i].value.str, NULL, 10);
+
+		// unknown option
+		else {
+			msg.copyFromCstr("Unknown config setting \"");
+			msg.appendFrom(&content.data[i].key);
+			msg.appendFromCstr("\".");
+			log_warn(msg.str);
+		}
+	}
+
+	filepath.free();
+	msg.free();
+	content.free();
+}
+
+func void Config.toFile(Config* cfg)
+{
+	sstring.String filepath = sstring.new(16);
+
+	/* get path */
+	if (get_config_path(&filepath) != 0) {
+		filepath.free();
+		cfg.invalid = true;
+		return;
+	}
+
+	// convert config into dict
+	Dict content = dict.new(1);
+	char[10] temp;
+
+	sprintf(temp, "%i", cfg.gfx_window_x);
+	Dict_add(&content, NAME_GFX_WINDOW_X, temp);
+	sprintf(temp, "%i", cfg.gfx_window_y);
+	Dict_add(&content, NAME_GFX_WINDOW_Y, temp);
+	sprintf(temp, "%i", cfg.gfx_window_w);
+	Dict_add(&content, NAME_GFX_WINDOW_W, temp);
+	sprintf(temp, "%i", cfg.gfx_window_h);
+	Dict_add(&content, NAME_GFX_WINDOW_H, temp);
+	sprintf(temp, "%i", cfg.gfx_window_fullscreen);
+	Dict_add(&content, NAME_GFX_WINDOW_FULLSCREEN, temp);
+
+	if (!content.toFile(filepath.str))
+		cfg.invalid = true;
+
+	filepath.free();
+	content.free();
+}

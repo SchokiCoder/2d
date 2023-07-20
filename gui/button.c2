@@ -1,0 +1,102 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+module button;
+
+import menu;
+import sprite local;
+import sstring local;
+import theme;
+
+const u32 TEXT_INIT_SIZE = 32;
+
+type ButtonStyle struct {
+	sdl.Color font_color;
+	sdl.Color bg_color;
+	sdl.Color disabled_color;
+	sdl.Color border_color;
+}
+
+type OnClick func void(void*);
+
+type Button struct {
+	Menu*       menu;
+	TTF_Font*   font;
+	bool        visible;
+	bool        active;
+	String      text;
+	Sprite      sprite;
+
+	sdl.Rect    rect;
+	ButtonStyle style;
+
+	OnClick     onClick;
+	void*       data_click;
+}
+
+func void
+Button.init(Button* button, Menu* menu, TTF_Font* font, const ButtonStyle style)
+{
+	button.menu = menu;
+	button.font = font;
+	button.text = newString(TEXT_INIT_SIZE);
+	button.sprite = spriteNew();
+	button.visible = true;
+	button.active = true;
+	button.style = style;
+	button.func_click = NULL;
+	button.data_click = NULL;
+
+	menu.buttons[menu.button_count] = button;
+	menu.button_count++;
+}
+
+func void Button.updateSprite(Button* button)
+{
+	button.sprite.free();
+	button.sprite = newSpriteFromText(button.menu.renderer,
+					  button.text.str,
+					  button.font,
+					  button.style.font_color);
+}
+
+func void Button.draw(Button* button)
+{
+	// draw bg
+	button.menu.renderer.setDrawColor(
+		button.style.bg_color.r,
+		button.style.bg_color.g,
+		button.style.bg_color.b,
+		button.style.bg_color.a);
+	button.menu.renderer.fillRect(&button.rect);
+
+	// draw border
+	button.menu.renderer.setDrawColor(
+		button.style.border_color.r,
+		button.style.border_color.g,
+		button.style.border_color.b,
+		button.style.border_color.a);
+	button.menu.renderer.drawRect(&button.rect);
+
+	// draw text
+	button.menu.renderer.copy(button.sprite.texture, NULL, &button.rect);
+
+	// if disabled, draw disabled shade
+	if (button.active == false) {
+		button.menu.renderer.setDrawColor(
+			button.style.disabled_color.r,
+			button.style.disabled_color.g,
+			button.style.disabled_color.b,
+			button.style.disabled_color.a);
+		button.menu.renderer.fillRect(&button.rect);
+	}
+}
+
+func void Button.resize(Button* button)
+{
+	button.rect.w = button.sprite.surface.w;
+	button.rect.h = button.sprite.surface.h;
+}

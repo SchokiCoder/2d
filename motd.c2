@@ -4,10 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-#ifndef _CH_MOTD_H
-#define _CH_MOTD_H
+module ch_motd;
 
-static const char *MOTDS[] = {
+const char*[] MOTDS = {
 	"6th Revision",
 	"my oldest project",
 	"Striitit!",
@@ -28,7 +27,5 @@ static const char *MOTDS[] = {
 	"i guess",
 	"seventy meters",
 	"Nile would dissolve",
-	"that just aint right"
-};
-
-#endif /* _CH_MOTD_H */
+	"maybe it's the moonlight",
+}

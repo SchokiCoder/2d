@@ -1,0 +1,120 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+module path;
+
+import errno;
+import stdio;
+import stdlib;
+import string;
+import sys/stat; add bindings?;
+
+import log;
+import path;
+
+#ifdef _WIN32
+const char* SLASH = "\\";
+#else
+const char* SLASH = "/";
+#endif
+
+const char* WORLDS = "worlds";
+const char* CONFIG = "config.cfg";
+//const char* TEXTURE_ICON = PATH_TEXTURES "icon.png";
+
+const char* FILETYPE_WORLD = "wld";
+//const char* FILETYPE_BACKUP = "bkp";
+
+bool get_base_path(String* out)
+{
+	bool ret;
+
+	// get path
+	out.appendFromCstr(getenv("HOME"));
+	out.appendFromCstr(SLASH);
+	out.appendFromCstr(".");
+	out.appendFromCstr(APP_NAME);
+	out.appendFromCstr(SLASH);
+
+	/* in case, create dir */
+	errno = 0;
+
+#ifdef _WIN32
+	ret = mkdir(out->str);
+#else
+	ret = mkdir(out->str, S_IRWXU);
+#endif
+
+	if (ret == -1) {
+		if (errno != EEXIST) {
+			log_err("Could not get userfiles path.");
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool get_world_path(String* out)
+{
+	bool ret;
+
+	/* get base path */
+	ret = get_base_path(out);
+
+	if (ret != false)
+		return ret;
+
+	/* get path */
+	out.appendFromCstr(PATH_WORLDS);
+	out.appendFromCstr(SLASH);
+
+	/* in case, create dir */
+	errno = 0;
+
+#ifdef _WIN32
+	ret = mkdir(out->str);
+#else
+	ret = mkdir(out->str, S_IRWXU);
+#endif
+
+	if (ret == -1) {
+		if (errno != EEXIST) {
+			log_err("Could not create worlds directory.");
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool get_config_path(String* out)
+{
+	bool ret;
+
+	/* get base path */
+	ret = get_base_path(out);
+
+	if (ret != 0)
+		return ret;
+
+	/* get path */
+	out.appendFromCstr(CONFIG);
+
+	return false;
+}
+
+bool file_check_existence(const char* path)
+{
+	FILE* f = fopen(path, "r");
+
+	if (f == NULL)
+		return false;
+
+	fclose(f);
+
+	return true;
+}

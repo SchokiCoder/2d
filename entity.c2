@@ -1,0 +1,138 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+module ch_entity;
+
+import ch_block;
+import world local;
+import physics;
+
+const f32 VELOCITY_THRESHOLD = 0.01;
+const f32 GRAVITY = ch_block.SIZE * 18;
+
+type Entities enum u32 {
+	None,
+	Player,
+}
+
+const EntityData[] DATA = {
+	[0] = {
+		.name = "none",
+		.width = 0,
+		.height = 0,
+		.acceleration = 0,
+		.max_velocity = 0,
+		.decceleration = 0,
+		.jump_velocity = 0,
+	},
+
+	[1] = {
+		.name = "player",
+		.width = (ch_block.SIZE * 2) - 6,
+		.height = (ch_block.SIZE * 3) - 8,
+		.acceleration = ch_block.SIZE * 12,
+		.max_velocity = ch_block.SIZE * 6,
+		.decceleration = ch_block.SIZE * 6,
+		.jump_velocity = ch_block.SIZE * 12,
+	}
+}
+
+/*
+	player_pos: 		player.rect.x or y
+	player_velocity:	player.velocity_x or y
+*/
+func bool
+Entity.move(Entity* ent,
+	    f32*    pos,
+	    f32*    velocity,
+	    f32     distance,
+	    World*  world)
+{
+	bool collision = false;
+	i32 x1;
+	i32 y1;
+	i32 x2;
+	i32 y2;
+	FRect block_hitbox;
+
+	// set position
+	*pos += distance;
+
+	// calculate which blocks to check
+	x1 = ent.rect.x / ch_block.SIZE;
+	y1 = ent.rect.y / ch_block.SIZE;
+	x2 = (ent.rect.x + ent.rect.w) / ch_block.SIZE + 1;
+	y2 = (ent.rect.y + ent.rect.h) / ch_block.SIZE + 1;
+
+	// check if within bounds
+	if (x1 < 0)
+		x1 = 0;
+
+	if (x1 > (i32) world.width - 1)
+		x1 = (i32) world.width - 1;
+
+	if (y1 < 0)
+		y1 = 0;
+
+	if (y1 > (i32) world.height - 1)
+		y1 = (i32) world.height - 1;
+
+	if (x2 < 0)
+		x2 = 0;
+
+	if (x2 > (i32) world.width - 1)
+		x2 = (i32) world.width - 1;
+
+	if (y2 < 0)
+		y2 = 0;
+
+	if (y2 > (i32) world.height - 1)
+		y2 = (i32) world.height - 1;
+
+	// collision check for nearby blocks
+	block_hitbox.w = ch_block.SIZE;
+	block_hitbox.h = ch_block.SIZE;
+
+	for (i32 x = x1; x <= x2; x++) {
+		for (i32 y = y1; y <= y2; y++) {
+			// if non-solid block here, skip
+			if (world.blocks[x][y][0] == B_NONE)
+				continue;
+
+			block_hitbox.x = x * ch_block.SIZE;
+			block_hitbox.y = y * ch_block.SIZE;
+
+			// if collision
+			if (ent.rect.withinFRect(&block_hitbox)) {
+				// flag, reset pos, kill velocity
+				collision = true;
+				*pos -= distance;
+				*velocity = 0.0f;
+			}
+		}
+	}
+
+	return collision;
+}
+
+func void Entity.moveX(Entity* ent, f32 x_distance, World* wld)
+{
+	ent.move(ent, &ent.rect.x, &ent.velocity_x, x_distance, wld);
+}
+
+func void Entity.moveY(Entity* ent, f32 y_distance, World* wld)
+{
+	bool collision;
+
+	// move
+	collision = ent.move(&ent.rect.y, &ent.velocity_y, y_distance, wld);
+
+	// if falling and collision happened, set grounded, else set non-grounded
+	if (y_distance > 0.0f && collision)
+		ent.grounded = true;
+	else
+		ent.grounded = false;
+}

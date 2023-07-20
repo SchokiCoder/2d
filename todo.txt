@@ -4,6 +4,16 @@ movement:
 	-add crouch slide						.
 }
 
+world creation
+{
+	-image to world conversion					.
+	 Each pixel is a block.
+	 1)   Draw image                        PNG
+	 2.1) Assign color codes to block id's  JSON
+	 2.2) Set entities                      JSON
+	 3)   Compile                           Compiler "Oven"
+}
+
 old problems (from c):
 {
 	-motd is bugged							.
@@ -14,15 +24,11 @@ old problems (from c):
 renaissance:
 {
 	-c2								.
-	 currently done:
-	 engine/ (except for world.c2:102:56)
-
-	-image to world conversion					.
-	 Each pixel is a block.
-	 1)   Draw image                        PNG
-	 2.1) Assign color codes to block id's  JSON
-	 2.2) Set entities                      JSON
-	 3)   Compile                           Compiler "Oven"
+	 currently not even started main.c2
+	 and minor issues (see compile output)
+	-apply new naming convention from gui to engine			.
+	-replace Points and Rects with SDL equivalents			.
+	-replace log sys with SDL_log					?
 
 	-set version to 0.1.0						.
 }

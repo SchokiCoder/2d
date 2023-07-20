@@ -4,6 +4,26 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+module entity;
+
+type EntityData struct {
+	char *name;
+	u32 width;
+	u32 height;
+	f32 acceleration;
+	f32 max_velocity;
+	f32 decceleration;
+	f32 jump_velocity;
+}
+
+type Entity struct {
+	u32 id;
+	FRect rect;
+	f32 velocity_x;
+	f32 velocity_y;
+	bool grounded;
+}
+
 /*
 #include "world.h"
 #include "entity.h"

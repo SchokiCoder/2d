@@ -1,0 +1,177 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+module physics;
+
+type FPoint struct {
+	f32 x;
+	f32 y;
+}
+
+type IPoint struct {
+	i32 x;
+	i32 y;
+}
+
+type UPoint struct {
+	u32 x;
+	u32 y;
+}
+
+type FRect struct {
+	f32 x;
+	f32 y;
+	f32 w;
+	f32 h;
+}
+
+type IRect struct {
+	i32 x;
+	i32 y;
+	i32 w;
+	i32 h;
+}
+
+type URect struct {
+	u32 x;
+	u32 y;
+	u32 w;
+	u32 h;
+}
+
+func bool FPoint.withinFRect(FPoint* pt, FRect* rect)
+{
+	if (pt.x > rect.x && pt.x < (rect.x + rect.w) &&
+	    pt.y > rect.y && pt.y < (rect.y + rect.h)) {
+		return true;
+	}
+
+	return false;
+}
+
+func bool IPoint.withinIRect(IPoint* pt, IRect* rect)
+{
+	if (pt.x > rect.x && pt.x < (rect.x + rect.w) &&
+	    pt.y > rect.y && pt.y < (rect.y + rect.h)) {
+		return true;
+	}
+
+	return false;
+}
+
+func bool FRect.withinFRect(FRect* a, FRect* b)
+{
+	FPoint pt;
+
+	// check if box 1 within box 2
+	pt.x = a.x;
+	pt.y = a.y;
+
+	if (fpoint_within_frect(&pt, b))
+		return true;
+
+	pt.x = a.x + a.w;
+	pt.y = a.y;
+
+	if (fpoint_within_frect(&pt, b))
+		return true;
+
+	pt.x = a.x;
+	pt.y = a.y + a.h;
+
+	if (fpoint_within_frect(&pt, b))
+		return true;
+
+	pt.x = a.x + a.w;
+	pt.y = a.y + a.h;
+
+	if (fpoint_within_frect(&pt, b))
+		return true;
+
+	// check if box 2 within box 1
+	pt.x = b.x;
+	pt.y = b.y;
+
+	if (fpoint_within_frect(&pt, a))
+		return true;
+
+	pt.x = b.x + a.w;
+	pt.y = b.y;
+
+	if (fpoint_within_frect(&pt, a))
+		return true;
+
+	pt.x = b.x;
+	pt.y = b.y + a.h;
+
+	if (fpoint_within_frect(&pt, a))
+		return true;
+
+	pt.x = b.x + a.w;
+	pt.y = b.y + a.h;
+
+	if (fpoint_within_frect(&pt, a))
+		return true;
+
+	return false;
+}
+
+func bool IRect.withinIRect(IRect* a, IRect* b)
+{
+	IPoint pt;
+
+	// check if box 1 within box 2
+	pt.x = a.x;
+	pt.y = a.y;
+
+	if (ipoint_within_irect(&pt, b))
+		return true;
+
+	pt.x = a.x + a.w;
+	pt.y = a.y;
+
+	if (ipoint_within_irect(&pt, b))
+		return true;
+
+	pt.x = a.x;
+	pt.y = a.y + a.h;
+
+	if (ipoint_within_irect(&pt, b))
+		return true;
+
+	pt.x = a.x + a.w;
+	pt.y = a.y + a.h;
+
+	if (ipoint_within_irect(&pt, b))
+		return true;
+
+	// check if box 2 within box 1
+	pt.x = b.x;
+	pt.y = b.y;
+
+	if (ipoint_within_irect(&pt, a))
+		return true;
+
+	pt.x = b.x + a.w;
+	pt.y = b.y;
+
+	if (ipoint_within_irect(&pt, a))
+		return true;
+
+	pt.x = b.x;
+	pt.y = b.y + a.h;
+
+	if (ipoint_within_irect(&pt, a))
+		return true;
+
+	pt.x = b.x + a.w;
+	pt.y = b.y + a.h;
+
+	if (ipoint_within_irect(&pt, a))
+		return true;
+
+	return false;
+}

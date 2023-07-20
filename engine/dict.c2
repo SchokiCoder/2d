@@ -1,0 +1,188 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
+
+module dict;
+
+import stdlib;
+import stdio;
+
+import sstring;
+
+type DictPair struct {
+	usize key_djb2;
+	String key;
+	String value;
+}
+
+type Dict struct {
+	bool invalid;
+	usize len;
+	usize size;
+	DictPair* data;
+}
+
+func usize djb2Encode(const char* str)
+{
+	// credits to Daniel J. Bernstein for this algorithm
+	usize result = 5381;
+	char temp;
+
+	while ((temp = *(str++)))
+		result += ((result << 5) + result) + temp;
+
+	return result;
+}
+
+func DictPair newDictPair(const char* key, const char* value)
+{
+	DictPair ret = {
+		.key_djb2 = djb2Encode(key),
+		.key = newStringFrom(key),
+		.value = newStringFrom(value),
+	}
+
+	return ret;
+}
+
+func void DictPair.free(DictPair* dictpair)
+{
+	dictpair.key.free();
+	dictpair.value.free();
+}
+
+func void Dict.grow(Dict* dict)
+{
+	dict.size *= 2;
+	dict.data = realloc(dict.data, sizeof(DictPair) *dict.size);
+}
+
+func void Dict.ensureSize(Dict* dict, usize size)
+{
+	while (dict.size < size)
+		dict.grow();
+}
+
+func Dict newDict(const usize inital_size)
+{
+	Dict ret = {
+		.invalid = false,
+		.len = 0,
+		.size = inital_size,
+		.data = malloc(sizeof(DictPair) *inital_size),
+	}
+
+	return ret;
+}
+
+func Dict newDictFromFile(const char* filepath)
+{
+	FILE* f;
+	Dict dict = newDict(1);
+
+	// open file
+	f = fopen(filepath, "r");
+
+	if (f == NULL) {
+		dict.invalid = true;
+		return dict;
+	}
+	// read each character
+	char[2] buf = "\0\0";
+	bool read_key = true;
+	String key = newString(8);
+	String value = newString(8);
+
+	while ((buf[0] = fgetc(f)) != EOF) {
+		switch (buf[0]) {
+		case ' ':
+			// ignore spaces
+			break;
+
+		case '=':
+			// set to read value
+			read_key = false;
+			break;
+
+		case '\n':
+			// save pair
+			Dict_add(&dict, key.str, value.str);
+
+			// set to read key, reset strings
+			read_key = true;
+			key.empty();
+			value.empty();
+			break;
+
+		default:
+			// append character to key or value
+			if (read_key == true)
+				key.appendFromCstr(buf);
+			else
+				value.appendFromCstr(buf);
+		}
+	}
+
+	fclose(f);
+	key.free();
+	value.free();
+	return dict;
+}
+
+func void Dict.add(Dict* dict, const char* key, const char* value)
+{
+	dict.ensureSize(dict.len + 1);
+
+	dict.data[dict.len] = newDictPair(key, value);
+
+	dict.len++;
+}
+
+func bool Dict.find(const Dict* dict, const char* key, usize* index)
+{
+	const usize key_djb2 = djb2Encode(key);
+
+	for (usize i = 0; i < dict.len; i++) {
+		if (dict.data[i].key_djb2 == key_djb2) {
+			*index = i;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+func bool Dict.toFile(const Dict* dict, const char* filepath)
+{
+	FILE* f;
+
+	// open
+	f = fopen(filepath, "w");
+
+	if (f == NULL)
+		return false;
+
+	// write
+	for (usize i = 0; i < dict.len; i++) {
+		fprintf(f, "%s", dict.data[i].key.str);
+		fputs(" = ", f);
+		fprintf(f, "%s", dict.data[i].value.str);
+		fputc('\n', f);
+	}
+
+	fclose(f);
+	return true;
+}
+
+func void Dict.free(Dict* dict)
+{
+	for (usize i = 0; i < dict.len; i++)
+		dict.data[i].free();
+
+	free(dict.data);
+
+	dict.size = 0;
+	dict.len = 0;
+}

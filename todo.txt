@@ -14,6 +14,8 @@ old problems (from c):
 renaissance:
 {
 	-c2								.
+	 currently done:
+	 engine/ (except for world.c2:102:56)
 
 	-image to world conversion					.
 	 Each pixel is a block.

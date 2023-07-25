@@ -71,26 +71,26 @@ Entity.move(Entity* ent,
 	if (x1 < 0)
 		x1 = 0;
 
-	if (x1 > (i32) world.width - 1)
-		x1 = (i32) world.width - 1;
+	if (x1 > cast<i32>(world.width) - 1)
+		x1 = cast<i32>(world.width) - 1;
 
 	if (y1 < 0)
 		y1 = 0;
 
-	if (y1 > (i32) world.height - 1)
-		y1 = (i32) world.height - 1;
+	if (y1 > cast<i32>(world.height) - 1)
+		y1 = cast<i32>(world.height) - 1;
 
 	if (x2 < 0)
 		x2 = 0;
 
-	if (x2 > (i32) world.width - 1)
-		x2 = (i32) world.width - 1;
+	if (x2 > cast<i32>(world.width) - 1)
+		x2 = cast<i32>(world.width) - 1;
 
 	if (y2 < 0)
 		y2 = 0;
 
-	if (y2 > (i32) world.height - 1)
-		y2 = (i32) world.height - 1;
+	if (y2 > cast<i32>(world.height) - 1)
+		y2 = cast<i32>(world.height) - 1;
 
 	// collision check for nearby blocks
 	block_hitbox.w = ch_block.SIZE;
@@ -110,7 +110,7 @@ Entity.move(Entity* ent,
 				// flag, reset pos, kill velocity
 				collision = true;
 				*pos -= distance;
-				*velocity = 0.0f;
+				*velocity = 0.0;
 			}
 		}
 	}
@@ -131,7 +131,7 @@ func void Entity.moveY(Entity* ent, f32 y_distance, World* wld)
 	collision = ent.move(&ent.rect.y, &ent.velocity_y, y_distance, wld);
 
 	// if falling and collision happened, set grounded, else set non-grounded
-	if (y_distance > 0.0f && collision)
+	if (y_distance > 0.0 && collision)
 		ent.grounded = true;
 	else
 		ent.grounded = false;

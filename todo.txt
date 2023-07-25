@@ -23,12 +23,26 @@ old problems (from c):
 
 renaissance:
 {
-	-c2								.
-	 currently not even started main.c2
-	 and minor issues (see compile output)
+	-rewrite in c2							v
+	 minor issues (see compile output)
+	-rewrite in c2                                                  .
+	 major issues (see compile output)
 	-apply new naming convention from gui to engine			.
 	-replace Points and Rects with SDL equivalents			.
 	-replace log sys with SDL_log					?
+
+	-reinstate "First" and "Last" member of enums			?	
+	-todo marks							.
+	-game.c2/Game.edit (width, height)				.
+	 ambigous parameter names
+
+	-are sstring/String's still useful with c2's elemsof()		?
+	 (can elemsof() work at runtime with heap alloc'd strings?)
+	-main.c2/btn_settings_click unsafe use of sstring/String	.
+	 add a internal printf to sstring/String, that automatically
+	 updates the len, what about size?
+	-add shortcuts for sstring methods to gui objects		.
+	 and make updateSprite(s) private
 
 	-set version to 0.1.0						.
 }

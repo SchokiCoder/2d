@@ -129,7 +129,7 @@ func void Entry.draw(Entry* entry)
 	// draw text
 	for (size_t i = 0; i < entry.text.len; i++) {
 		// if text exceeds entry width, stop
-		if (text_width > (u32) entry.rect.w)
+		if (text_width > cast<u32>(entry.rect.w))
 			break;
 
 		// draw

@@ -3,24 +3,30 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 executable chemarium
-	$generate-c
+        $use sdl2 dynamic
+        $use sdl2_ttf dynamic
+        $generate-c
 
-	engine/dict.c2
-	engine/entity.c2
-	engine/log.c2
-	engine/physics.c2
-	engine/sstring.c2
-	engine/world.c2
-	gui/button.c2
-	gui/entry.c2
-	gui/label.c2
-	gui/menu.c2
-	gui/sprite.c2
-	config.c2
-	entity.c2
-	game.c2
-	meta.c2
-	main.c2
-	path.c2
-	world.c2
+        engine/dict.c2
+        engine/entity.c2
+        engine/log.c2
+        engine/physics.c2
+        engine/sstring.c2
+        engine/world.c2
+        gui/button.c2
+        gui/entry.c2
+        gui/label.c2
+        gui/menu.c2
+        gui/sprite.c2
+        gui/theme.c2
+        gui/def_themes.c2
+        block.c2
+        config.c2
+        entity.c2
+        game.c2
+        meta.c2
+        main.c2
+        motd.c2
+        path.c2
+        world.c2
 end

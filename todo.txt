@@ -25,8 +25,20 @@ renaissance:
 {
 	-rewrite in c2							v
 	 minor issues (see compile output)
-	-rewrite in c2                                                  .
-	 major issues (see compile output)
+	-sys/stat.h is already as sys_stat.c2i in libc			v
+	-Config.toFile "temp" should be 16 long				v
+	 (negative 2 billion is longer than 10)
+
+	-rewrite in c2                                                  v
+	 c2c can't recognise array of struct within struct?
+	 this problem has been silenced with comments
+	 but got TODO marks
+
+        -circular dependencies                                          .
+         i thought the module system prevented this from being
+         an issue in the first place
+         IT'S HAPPENING, OH GOD IT'S HAPPENING!!!
+
 	-apply new naming convention from gui to engine			.
 	-replace Points and Rects with SDL equivalents			.
 	-replace log sys with SDL_log					?
@@ -36,6 +48,8 @@ renaissance:
 	-game.c2/Game.edit (width, height)				.
 	 ambigous parameter names
 
+        -import math removed from main.c2 bindings needed               .
+
 	-are sstring/String's still useful with c2's elemsof()		?
 	 (can elemsof() work at runtime with heap alloc'd strings?)
 	-main.c2/btn_settings_click unsafe use of sstring/String	.
@@ -43,6 +57,9 @@ renaissance:
 	 updates the len, what about size?
 	-add shortcuts for sstring methods to gui objects		.
 	 and make updateSprite(s) private
+
+	-this thing needs a data-oriented REWORK			.
+	 rethink structs and convert into simple ECS
 
 	-set version to 0.1.0						.
 }

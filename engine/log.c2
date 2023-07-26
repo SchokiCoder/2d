@@ -7,7 +7,7 @@
 module log;
 
 import stdio;
-import time;
+import libc_time;
 
 const char* PATH_LOG = "log.txt";
 

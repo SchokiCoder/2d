@@ -123,7 +123,7 @@ func void Config.toFile(Config* cfg)
 
 	// convert config into dict
 	Dict content = dict.new(1);
-	char[10] temp;
+	char[16] temp;
 
 	sprintf(temp, "%i", cfg.gfx_window_x);
 	Dict_add(&content, NAME_GFX_WINDOW_X, temp);

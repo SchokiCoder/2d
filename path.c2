@@ -4,18 +4,17 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-module path;
+module ch_path;
 
-import errno;
+import c_errno;
 import stdio;
 import stdlib;
 import string;
-import sys/stat; add bindings?;
+import sys_stat;
 
 import log;
-import path;
 
-#ifdef _WIN32
+#if defined _WIN32
 const char* SLASH = "\\";
 #else
 const char* SLASH = "/";
@@ -28,7 +27,7 @@ const char* CONFIG = "config.cfg";
 const char* FILETYPE_WORLD = "wld";
 //const char* FILETYPE_BACKUP = "bkp";
 
-bool get_base_path(String* out)
+func bool get_base_path(String* out)
 {
 	bool ret;
 
@@ -42,10 +41,10 @@ bool get_base_path(String* out)
 	/* in case, create dir */
 	errno = 0;
 
-#ifdef _WIN32
-	ret = mkdir(out->str);
+#if defined _WIN32
+	ret = mkdir(out.str);
 #else
-	ret = mkdir(out->str, S_IRWXU);
+	ret = mkdir(out.str, S_IRWXU);
 #endif
 
 	if (ret == -1) {
@@ -58,7 +57,7 @@ bool get_base_path(String* out)
 	return false;
 }
 
-bool get_world_path(String* out)
+func bool get_world_path(String* out)
 {
 	bool ret;
 
@@ -75,10 +74,10 @@ bool get_world_path(String* out)
 	/* in case, create dir */
 	errno = 0;
 
-#ifdef _WIN32
-	ret = mkdir(out->str);
+#if defined _WIN32
+	ret = mkdir(out.str);
 #else
-	ret = mkdir(out->str, S_IRWXU);
+	ret = mkdir(out.str, S_IRWXU);
 #endif
 
 	if (ret == -1) {
@@ -91,7 +90,7 @@ bool get_world_path(String* out)
 	return false;
 }
 
-bool get_config_path(String* out)
+func bool get_config_path(String* out)
 {
 	bool ret;
 
@@ -107,7 +106,7 @@ bool get_config_path(String* out)
 	return false;
 }
 
-bool file_check_existence(const char* path)
+func bool file_check_existence(const char* path)
 {
 	FILE* f = fopen(path, "r");
 

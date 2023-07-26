@@ -6,10 +6,9 @@
 
 module ch_main;
 
-import math;
 import sdl;
 import sdl_ttf;
-import time;
+import libc_time;
 
 import button;
 import ch_config;

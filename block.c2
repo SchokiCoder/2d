@@ -8,7 +8,7 @@ module ch_block;
 
 const i32 SIZE = 32;
 
-type Blocks enum {
+type Blocks enum u32 {
 	None,
 	Dirt,
 	Stone,

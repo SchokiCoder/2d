@@ -6,7 +6,7 @@
 
 module ch_game;
 
-import time;
+import libc_time;
 
 import ch_block;
 import ch_config local;

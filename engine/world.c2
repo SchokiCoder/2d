@@ -14,17 +14,17 @@ import entity local;
 import sstring;
 
 type World struct {
-	bool invalid;
+	bool               invalid;
 
 	u32                block_size;
 	u32                width;
 	u32                height;
 	u32                depth;
-	u32***             blocks;
+	u32[][][]          blocks;
 	SDL_Texture*[][][] block_textures;
 
 	u32                ent_count;
-	Entity*            entities;
+	Entity[]           entities;
 }
 
 func void World.allocate(World* world)
@@ -98,9 +98,9 @@ func World newWorldFromFile(const char* filepath)
 				      sizeof(world.blocks[x][y][z]), 1, f);
 
 	// read entitites
-	for (size i = 0; i < world.ent_count; i++) {
-		fread(&world.entities[i].id, sizeof(world.entities[i].id), 1,
-		      f);
+	for (usize i = 0; i < world.ent_count; i++) {
+		fread(&world.entities[i].id, sizeof(world.entities[i]/*.id*/), 1, f);
+/* TODO c2c bug? (see above statement as well)
 		fread(&world.entities[i].rect.x,
 		      sizeof(world.entities[i].rect.x), 1, f);
 		fread(&world.entities[i].rect.y,
@@ -115,6 +115,7 @@ func World newWorldFromFile(const char* filepath)
 		      sizeof(world.entities[i].velocity_x), 1, f);
 		fread(&world.entities[i].velocity_y,
 		      sizeof(world.entities[i].velocity_y), 1, f);
+*/
 	}
 
 	fclose(f);
@@ -150,8 +151,9 @@ func void World.toFile(World* world, const char* filepath)
 
 	// write entities
 	for (size_t i = 0; i < world.ent_count; i++) {
-		fwrite(&world.entities[i].id, sizeof(world.entities[i].id), 1,
+		fwrite(&world.entities[i].id, sizeof(world.entities[i]/*.id*/), 1,
 		       f);
+/* TODO c2c bug? (see above statement as well)
 		fwrite(&world.entities[i].rect.x,
 		       sizeof(world.entities[i].rect.x), 1, f);
 		fwrite(&world.entities[i].rect.y,
@@ -166,6 +168,7 @@ func void World.toFile(World* world, const char* filepath)
 		       sizeof(world.entities[i].velocity_x), 1, f);
 		fwrite(&world.entities[i].velocity_y,
 		       sizeof(world.entities[i].velocity_y), 1, f);
+*/
 	}
 
 	fclose(f);

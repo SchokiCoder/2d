@@ -15,8 +15,8 @@ void Button_new(struct Button *button,
 	button->font = font;
 	button->text = String_new(BUTTON_TEXT_INIT_SIZE);
 	button->sprite = Sprite_new();
-	button->visible = true;
-	button->active = true;
+	button->visible = 1;
+	button->active = 1;
 	button->style = style;
 	button->func_click = NULL;
 	button->data_click = NULL;
@@ -57,7 +57,7 @@ void Button_draw(struct Button *button)
 		       button->sprite.texture, NULL, &button->rect);
 
 	// if disabled, draw disabled shade
-	if (button->active == false) {
+	if (button->active == 0) {
 		SDL_SetRenderDrawColor(button->menu->renderer,
 				       button->style.disabled_color.r,
 				       button->style.disabled_color.g,

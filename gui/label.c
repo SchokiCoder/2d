@@ -15,7 +15,7 @@ void Label_new(struct Label            *label,
 	label->font = font;
 	label->text = String_new(LABEL_TEXT_INIT_SIZE);
 	label->sprite = Sprite_new();
-	label->visible = true;
+	label->visible = 1;
 	label->style = style;
 
 	menu->labels[menu->label_count] = label;

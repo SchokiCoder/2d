@@ -20,8 +20,8 @@ void Entry_new(struct Entry             *entry,
 		entry->sprites[i] = Sprite_new();
 
 	entry->text = String_new(ENTRY_TEXT_INIT_SIZE);
-	entry->visible = true;
-	entry->active = true;
+	entry->visible = 1;
+	entry->active = 1;
 	entry->style = style;
 
 	menu->entries[menu->entry_count] = entry;
@@ -119,7 +119,7 @@ void Entry_draw(struct Entry *entry)
 	}
 
 	// if disabled, draw disabled shade
-	if (entry->active == false) {
+	if (entry->active == 0) {
 		SDL_SetRenderDrawColor(entry->menu->renderer,
 				       entry->style.disabled_color.r,
 				       entry->style.disabled_color.g,

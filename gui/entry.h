@@ -5,8 +5,6 @@
 #ifndef _ENTRY_H
 #define _ENTRY_H
 
-#include <stdbool.h>
-
 #include "sprite.h"
 #include "engine/sstring.h"
 #include "engine/types.h"

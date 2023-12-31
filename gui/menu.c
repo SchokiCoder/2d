@@ -19,8 +19,8 @@ struct Menu Menu_new(SDL_Renderer *renderer, const struct MenuStyle style)
 		.button_count = 0,
 		.entry_count = 0,
 		.focused_entry = NULL,
-		.visible = true,
-		.active = true,
+		.visible = 1,
+		.active = 1,
 		.style = style
 	};
 
@@ -29,32 +29,27 @@ struct Menu Menu_new(SDL_Renderer *renderer, const struct MenuStyle style)
 
 void Menu_draw(struct Menu *menu)
 {
-	// stop if not visible
-	if (menu->visible == false)
+	if (menu->visible == 0)
 		return;
 
-	// draw bg
 	SDL_SetRenderDrawColor(menu->renderer,
 			       menu->style.bg_color.r,
 			       menu->style.bg_color.g,
 			       menu->style.bg_color.b, menu->style.bg_color.a);
 	SDL_RenderFillRect(menu->renderer, &menu->rect);
 
-	// draw labels
 	for (u8 i = 0; i < menu->label_count; i++) {
 		if (menu->labels[i]->visible) {
 			Label_draw(menu->labels[i]);
 		}
 	}
 
-	// draw buttons
 	for (u8 i = 0; i < menu->button_count; i++) {
 		if (menu->buttons[i]->visible) {
 			Button_draw(menu->buttons[i]);
 		}
 	}
 
-	// draw entries
 	for (u8 i = 0; i < menu->entry_count; i++) {
 		if (menu->entries[i]->visible) {
 			Entry_draw(menu->entries[i]);
@@ -66,22 +61,19 @@ void Menu_handle_event(struct Menu *menu, SDL_Event *event)
 {
 	SDL_Point mouse;
 
-	// stop if not visible or not active
-	if (menu->visible == false || menu->active == false)
+	if (menu->visible == 0 || menu->active == 0)
 		return;
 
-	// handle current event
 	switch (event->type) {
 	case SDL_MOUSEBUTTONUP:
 
-		// get mouse coords
 		SDL_GetMouseState(&mouse.x, &mouse.y);
 
 		// check buttons
 		for (u8 i = 0; i < menu->button_count; i++) {
 			// if not visible or not active or no event-function stored, skip
-			if (menu->buttons[i]->visible == false ||
-			    menu->buttons[i]->active == false ||
+			if (menu->buttons[i]->visible == 0 ||
+			    menu->buttons[i]->active == 0 ||
 			    menu->buttons[i]->func_click == NULL)
 				continue;
 
@@ -97,8 +89,8 @@ void Menu_handle_event(struct Menu *menu, SDL_Event *event)
 		// check entries
 		for (u8 i = 0; i < menu->entry_count; i++) {
 			// if not visible or not active, skip
-			if (menu->entries[i]->visible == false ||
-			    menu->entries[i]->active == false)
+			if (menu->entries[i]->visible == 0 ||
+			    menu->entries[i]->active == 0)
 				continue;
 
 			// if mouse hit entry

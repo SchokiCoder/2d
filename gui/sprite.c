@@ -9,7 +9,7 @@
 struct Sprite Sprite_new(void)
 {
 	struct Sprite result = {
-		.invalid = false,
+		.invalid = 0,
 		.surface = NULL,
 		.texture = NULL
 	};
@@ -25,13 +25,13 @@ void Sprite_create_texture(struct Sprite *sprite, SDL_Renderer *renderer)
 
 	// check
 	if (sprite->texture == NULL) {
-		sprite->invalid = true;
+		sprite->invalid = 1;
 	}
 }
 
 struct Sprite Sprite_from_file(SDL_Renderer *renderer, const char *filepath)
 {
-	struct Sprite result = {.invalid = false };
+	struct Sprite result = {.invalid = 0 };
 
 	// load image, create texture
 	result.surface = SDL_LoadBMP(filepath);
@@ -43,7 +43,7 @@ struct Sprite Sprite_from_file(SDL_Renderer *renderer, const char *filepath)
 struct Sprite Sprite_from_text(SDL_Renderer *renderer, const char *text,
 				  TTF_Font *font, SDL_Color color)
 {
-	struct Sprite result = {.invalid = false };
+	struct Sprite result = {.invalid = 0 };
 
 	// create text, create texture
 	result.surface = TTF_RenderText_Solid(font, text, color);
@@ -55,7 +55,7 @@ struct Sprite Sprite_from_text(SDL_Renderer *renderer, const char *text,
 void Sprite_clear(struct Sprite *sprite)
 {
 	//reset values
-	sprite->invalid = false;
+	sprite->invalid = 0;
 
 	// if surface and texture exist, clear them
 	if (sprite->surface != NULL) {

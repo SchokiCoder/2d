@@ -21,6 +21,8 @@ Each pixel is a block.
 + replace almost all "chemarium" strings with "generic2d"
 + relicense under gpl v2 or later
 + repo rename generic2d
++ replace remnants of stdbool with int
+  Where supposed to be removed long ago.
 - fix all mem issues
 	- fix heap-buffer-overflow "String_new engine/sstring.c:44"
 	  just yoink hui/hstring?

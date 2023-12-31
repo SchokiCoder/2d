@@ -7,12 +7,11 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
-#include <stdbool.h>
 
 #include "engine/types.h"
 
 struct Sprite {
-	bool invalid;
+	int invalid;
 	SDL_Surface *surface;
 	SDL_Texture *texture;
 };

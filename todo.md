@@ -8,6 +8,7 @@
 - before actually implementing new features, make a goals.md
 
 ## image to world conversion
+
 Each pixel is a block.
 1)   Draw image                        PNG
 2.1) Assign color codes to block id's  JSON
@@ -16,6 +17,11 @@ Each pixel is a block.
 
 # old problems
 
+- add fsanitize
+- replace almost all "chemarium" strings with "generic2d"
+- gpl v2
+- repo rename generic2d
+- fix all mem issues
 - consider zig cc
 - unused variable warnings
   (most likely because of -c flag oriented compilation)
@@ -33,7 +39,7 @@ Each pixel is a block.
   through the parsed data with the actual character like 'a')
 
 - remove block-based world building
-  add images as maps						
+  add images as maps
   In this case, i think a hotswap system for quickly changing
   maps is needed. So that developing a map as a picture can be
   easily cut into multiple pictures.

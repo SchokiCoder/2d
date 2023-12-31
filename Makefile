@@ -1,13 +1,12 @@
-# This Source Code Form is subject to the terms of the Mozilla Public
-# License, v. 2.0. If a copy of the MPL was not distributed with this
-# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (C) 2023  Andy Frank Schoknecht
 
-APP_NAME=chemarium
-APP_VERSION=0.0.0
-APP_LICENSE=MPLv2
-APP_LICENSE_SOURCE1=If a copy of the MPL was not distributed with this file,
-APP_LICENSE_SOURCE2=You can obtain one at https://mozilla.org/MPL/2.0/.
-APP_SOURCE=https://github.com/SchokiCoder/chemarium
+APP_NAME="generic2d"
+APP_VERSION="0.0.0"
+APP_LICENSE="GPL-2.0-or-later"
+APP_LICENSE_SOURCE1="You should have received a copy of the GNU General Public License along with this program;"
+APP_LICENSE_SOURCE2="if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."
+APP_SOURCE="https://github.com/SchokiCoder/generic2d"
 
 BIN_DIR=$(HOME)/.local/bin
 TEXTURES_DIR=$(HOME)/.local/share/$(APP_NAME)/textures
@@ -24,10 +23,10 @@ DEFINES=-D PATH_TEXTURES="\"$(TEXTURES_DIR)/\"" \
 
 CC=cc
 INCLUDE=-I . -I /usr/include/SDL2
-LIBS=-l SDL2 -l SDL2_image -l SDL2_ttf
+LIBS=-l SDL2 -l SDL2_ttf
 CFLAGS=-std=c99 -Wall -Wextra $(INCLUDE) $(LIBS) $(DEFINES)
 REL_CFLAGS=$(CFLAGS) -Os
-DEB_CFLAGS=$(CFLAGS) -g -D _DEBUG
+DEB_CFLAGS=$(CFLAGS) -g -D _DEBUG -fsanitize=address,undefined
 
 TARGETS_GUI=gui/sprite.o \
 	gui/entry.o \
@@ -44,12 +43,12 @@ TARGETS_ENGINE=engine/dict.o \
 TARGETS=$(TARGETS_ENGINE) $(TARGETS_GUI) \
 	world.o path.o main.o game.o entity.o config.o
 
-# the difference between this and chemarium_d sucks but it works for now
-chemarium: *.c engine/*.c gui/*.c
+# compiles every module itself
+generic2d: *.c engine/*.c gui/*.c
 	$(CC) $(REL_CFLAGS) -o $@ $^
 
 # this is built more often, so it gets the speed improvement
-chemarium_d: $(TARGETS)
+generic2d_d: $(TARGETS)
 	$(CC) $(DEB_CFLAGS) -o $@ $^
 
 config.o: config.c config.h
@@ -102,5 +101,5 @@ engine/dict.o: engine/dict.c engine/dict.h
 
 clean:
 	rm -f $(TARGETS)
-	rm -f chemarium
-	rm -f chemarium_d
+	rm -f generic2d
+	rm -f generic2d_d

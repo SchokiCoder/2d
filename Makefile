@@ -1,17 +1,15 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2023  Andy Frank Schoknecht
 
-APP_NAME="generic2d"
-APP_VERSION="0.0.0"
-APP_LICENSE="GPL-2.0-or-later"
-APP_LICENSE_SOURCE1="You should have received a copy of the GNU General Public License along with this program;"
-APP_LICENSE_SOURCE2="if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA."
-APP_SOURCE="https://github.com/SchokiCoder/generic2d"
+APP_NAME=generic2d
+APP_VERSION=0.0.0
+APP_LICENSE=GPL-2.0-or-later
+APP_LICENSE_SOURCE1=You should have received a copy of the GNU General Public License along with this program;
+APP_LICENSE_SOURCE2=if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+APP_SOURCE=https://github.com/SchokiCoder/generic2d
 
 BIN_DIR=$(HOME)/.local/bin
 TEXTURES_DIR=$(HOME)/.local/share/$(APP_NAME)/textures
-#DESKTOP_DIR=/usr/share/applications
-#ICONS_DIR=/usr/share/icons/hicolor
 
 DEFINES=-D PATH_TEXTURES="\"$(TEXTURES_DIR)/\"" \
 	-D APP_NAME="\"$(APP_NAME)\"" \

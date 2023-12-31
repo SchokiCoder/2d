@@ -1,6 +1,8 @@
 *.o
 gui/*.o
 engine/*.o
+generic2d
+generic2d_d
 chemarium
 chemarium_d
 log.txt

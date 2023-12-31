@@ -17,11 +17,13 @@ Each pixel is a block.
 
 # old problems
 
-- add fsanitize
-- replace almost all "chemarium" strings with "generic2d"
-- gpl v2
-- repo rename generic2d
++ add fsanitize to compile
++ replace almost all "chemarium" strings with "generic2d"
++ relicense under gpl v2 or later
++ repo rename generic2d
 - fix all mem issues
+	- fix heap-buffer-overflow "String_new engine/sstring.c:44"
+	  just yoink hui/hstring?
 - consider zig cc
 - unused variable warnings
   (most likely because of -c flag oriented compilation)

@@ -24,8 +24,8 @@ Each pixel is a block.
 + replace remnants of stdbool with int
   Where supposed to be removed long ago.
 - fix all mem issues
-	- fix heap-buffer-overflow "String_new engine/sstring.c:44"
-	  just yoink hui/hstring?
+	+ fix string yank
+	- main.c:522 sigsegv sdl surface
 - consider zig cc
 - unused variable warnings
   (most likely because of -c flag oriented compilation)
@@ -35,14 +35,14 @@ Each pixel is a block.
 -----
 
 # canceled
-- add image fontmap
++ add image fontmap
   monospcae, utf-8, no rgb image
   represent ALL characters as filled square except:
   latin characters, numbers, common special chars ,;.:-_ etc
   (by including all utf-8 characters we can iterate
   through the parsed data with the actual character like 'a')
 
-- remove block-based world building
++ remove block-based world building
   add images as maps
   In this case, i think a hotswap system for quickly changing
   maps is needed. So that developing a map as a picture can be
@@ -61,28 +61,28 @@ Each pixel is a block.
 
 # rehab
 
-- finish Makefile
-- fix application metadata
-- fix linker error
-- Config_save -> Config_to_file
-- are debug builds actually valid
++ finish Makefile
++ fix application metadata
++ fix linker error
++ Config_save -> Config_to_file
++ are debug builds actually valid
   (because o-files are not compiled with -g or -D _DEBUG)
-- same ^ for -Os
-- fix segfault
++ same ^ for -Os
++ fix segfault
   this is due to not finding the font
   (has no NULL check lol)
   actual fix postponed due to obsolesence
-- double free on game start
-- add cc sa license to assets
++ double free on game start
++ add cc sa license to assets
 
 
 # refactor
 
-- remove typedef from struct
++ remove typedef from struct
   GNU indent messed my pointers up: "muh * ptr"
 
 ## bool -> int
 
-- engine
-- gui
-- main
++ engine
++ gui
++ main

@@ -67,6 +67,8 @@ f32 now(void)
 
 void Game_setup(struct Game *game)
 {
+	const char *temp;
+	
 	game->active = 1;
 	game->msg = String_new(8);
 
@@ -89,9 +91,13 @@ void Game_setup(struct Game *game)
 	game->world = World_from_file(game->world_name);
 
 	if (game->world.invalid) {
-		String_copy_cstr(&game->msg, "World ");
-		String_append_cstr(&game->msg, game->world_name);
-		String_append_cstr(&game->msg, "is not valid.");
+		temp = "World ";
+		String_copy(&game->msg, temp, strlen(temp));
+		String_append(&game->msg,
+		              game->world_name,
+		              strlen(game->world_name));
+		temp = "is not valid.";
+		String_append(&game->msg, temp, strlen(temp));
 		Game_clear(game);
 		return;
 	}
@@ -103,11 +109,13 @@ void Game_setup(struct Game *game)
 					  PATH_TEXTURES_BLOCKS[i - 1]);
 
 		if (game->spr_blocks[i].invalid) {
-			String_copy_cstr(&game->msg, "Sprite ");
-			String_append_cstr(&game->msg,
-					   PATH_TEXTURES_BLOCKS[i - 1]);
-			String_append_cstr(&game->msg,
-					   " could not be loaded.");
+			temp = "Sprite ";
+			String_copy(&game->msg, temp, strlen(temp));
+			String_append(&game->msg,
+			              PATH_TEXTURES_BLOCKS[i - 1],
+			              strlen(PATH_TEXTURES_BLOCKS[i - 1]));
+			temp = " could not be loaded.";
+			String_append(&game->msg, temp, strlen(temp));
 
 			log_err(game->msg.str);
 			Game_clear(game);
@@ -144,11 +152,13 @@ void Game_setup(struct Game *game)
 					  PATH_TEXTURES_ENTITIES[i - 1]);
 
 		if (game->spr_ents[i].invalid) {
-			String_copy_cstr(&game->msg, "Sprite ");
-			String_append_cstr(&game->msg,
-					   PATH_TEXTURES_ENTITIES[i - 1]);
-			String_append_cstr(&game->msg,
-					   " could not be loaded.");
+			temp = "Sprite ";
+			String_copy(&game->msg, temp, strlen(temp));
+			String_append(&game->msg,
+			              PATH_TEXTURES_ENTITIES[i - 1],
+			              strlen(PATH_TEXTURES_ENTITIES[i - 1]));
+			temp = " could not be loaded.";
+			String_append(&game->msg, temp, strlen(temp));
 
 			log_err(game->msg.str);
 			Game_clear(game);
@@ -189,8 +199,9 @@ void Game_run(struct Game *game)
 	struct Label lbl_grounded_val;
 #endif
 
+	char *temp;
 	struct Entity *player = NULL;
-	SDL_Rect temp;
+	SDL_Rect temp_rect;
 	f32 ts1, ts2, delta = 0.0f;
 	f32 x_step = 0.0f;
 	f32 y_step = 0.0f;
@@ -208,10 +219,11 @@ void Game_run(struct Game *game)
 			player = &game->world.entities[i];
 
 	if (player == NULL) {
-		String_copy_cstr(&game->msg, "World ");
-		String_append_cstr(&game->msg, game->world_name);
-		String_append_cstr(&game->msg,
-				      " does not contain a player entity.");
+		temp = "World ";
+		String_copy(&game->msg, temp, strlen(temp));
+		String_append(&game->msg, game->world_name, strlen(game->world_name));
+		temp = " does not contain a player entity.";		
+		String_append(&game->msg, temp, strlen(temp));
 		log_err(game->msg.str);
 
 		Game_clear(game);
@@ -219,9 +231,8 @@ void Game_run(struct Game *game)
 	}
 #ifdef _DEBUG
 	// load font
-	font =
-	    TTF_OpenFont("/usr/share/fonts/liberation-mono/LiberationMono-Regular.ttf",
-			 16);
+	font = TTF_OpenFont("/usr/share/fonts/liberation-mono/LiberationMono-Regular.ttf",
+	                    16);
 
 	// make debug values menu
 	mnu_debugvals = Menu_new(game->renderer, THEME_DEBUG.menu);
@@ -247,14 +258,16 @@ void Game_run(struct Game *game)
 	mnu_debugvals.rect.w = game->cfg->gfx_window_w;
 	mnu_debugvals.rect.h = game->cfg->gfx_window_h;
 
-	String_copy_cstr(&lbl_velocity_x.text, "vel_x:");
+	temp = "vel_x:";
+	String_copy(&lbl_velocity_x.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_velocity_x);
 	lbl_velocity_x.rect.w = lbl_velocity_x.sprite.surface->w;
 	lbl_velocity_x.rect.h = lbl_velocity_x.sprite.surface->h;
 	lbl_velocity_x.rect.x = 0;
 	lbl_velocity_x.rect.y = 0;
 
-	String_copy_cstr(&lbl_velocity_x_val.text, "0");
+	temp = "0";
+	String_copy(&lbl_velocity_x_val.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_velocity_x_val);
 	lbl_velocity_x_val.rect.w = lbl_velocity_x_val.sprite.surface->w;
 	lbl_velocity_x_val.rect.h = lbl_velocity_x_val.sprite.surface->h;
@@ -262,7 +275,8 @@ void Game_run(struct Game *game)
 	    lbl_velocity_x.rect.x + lbl_velocity_x.rect.w + 10;
 	lbl_velocity_x_val.rect.y = lbl_velocity_x.rect.y;
 
-	String_copy_cstr(&lbl_velocity_y.text, "vel_y:");
+	temp = "vel_y:";
+	String_copy(&lbl_velocity_y.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_velocity_y);
 	lbl_velocity_y.rect.w = lbl_velocity_y.sprite.surface->w;
 	lbl_velocity_y.rect.h = lbl_velocity_y.sprite.surface->h;
@@ -270,7 +284,8 @@ void Game_run(struct Game *game)
 	lbl_velocity_y.rect.y =
 	    lbl_velocity_x.rect.y + lbl_velocity_x.rect.h + 10;
 
-	String_copy_cstr(&lbl_velocity_y_val.text, "0");
+	temp = "0";
+	String_copy(&lbl_velocity_y_val.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_velocity_y_val);
 	lbl_velocity_y_val.rect.w = lbl_velocity_y_val.sprite.surface->w;
 	lbl_velocity_y_val.rect.h = lbl_velocity_y_val.sprite.surface->h;
@@ -278,7 +293,8 @@ void Game_run(struct Game *game)
 	    lbl_velocity_y.rect.x + lbl_velocity_y.rect.w + 10;
 	lbl_velocity_y_val.rect.y = lbl_velocity_y.rect.y;
 
-	String_copy_cstr(&lbl_pos_x.text, "pos_x:");
+	temp = "pos_x:";
+	String_copy(&lbl_pos_x.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_pos_x);
 	lbl_pos_x.rect.w = lbl_pos_x.sprite.surface->w;
 	lbl_pos_x.rect.h = lbl_pos_x.sprite.surface->h;
@@ -286,35 +302,40 @@ void Game_run(struct Game *game)
 	lbl_pos_x.rect.y =
 	    lbl_velocity_y_val.rect.y + lbl_velocity_y_val.rect.h + 10;
 
-	String_copy_cstr(&lbl_pos_x_val.text, "0");
+	temp = "0";
+	String_copy(&lbl_pos_x_val.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_pos_x_val);
 	lbl_pos_x_val.rect.w = lbl_pos_x_val.sprite.surface->w;
 	lbl_pos_x_val.rect.h = lbl_pos_x_val.sprite.surface->h;
 	lbl_pos_x_val.rect.x = lbl_pos_x.rect.x + lbl_pos_x.rect.w + 10;
 	lbl_pos_x_val.rect.y = lbl_pos_x.rect.y;
 
-	String_copy_cstr(&lbl_pos_y.text, "pos_y:");
+	temp = "pos_y:";
+	String_copy(&lbl_pos_y.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_pos_y);
 	lbl_pos_y.rect.w = lbl_pos_y.sprite.surface->w;
 	lbl_pos_y.rect.h = lbl_pos_y.sprite.surface->h;
 	lbl_pos_y.rect.x = lbl_velocity_x.rect.x;
 	lbl_pos_y.rect.y = lbl_pos_x_val.rect.y + lbl_pos_x_val.rect.h + 10;
 
-	String_copy_cstr(&lbl_pos_y_val.text, "0");
+	temp = "0";
+	String_copy(&lbl_pos_y_val.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_pos_y_val);
 	lbl_pos_y_val.rect.w = lbl_pos_y_val.sprite.surface->w;
 	lbl_pos_y_val.rect.h = lbl_pos_y_val.sprite.surface->h;
 	lbl_pos_y_val.rect.x = lbl_pos_x.rect.x + lbl_pos_x.rect.w + 10;
 	lbl_pos_y_val.rect.y = lbl_pos_y.rect.y;
 
-	String_copy_cstr(&lbl_grounded.text, "grnd:");
+	temp = "grnd:";
+	String_copy(&lbl_grounded.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_grounded);
 	lbl_grounded.rect.w = lbl_grounded.sprite.surface->w;
 	lbl_grounded.rect.h = lbl_grounded.sprite.surface->h;
 	lbl_grounded.rect.x = lbl_velocity_x.rect.x;
 	lbl_grounded.rect.y = lbl_pos_y_val.rect.y + lbl_pos_y_val.rect.h + 10;
 
-	String_copy_cstr(&lbl_grounded_val.text, "0");
+	temp = "0";
+	String_copy(&lbl_grounded_val.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_grounded_val);
 	lbl_grounded_val.rect.w = lbl_grounded_val.sprite.surface->w;
 	lbl_grounded_val.rect.h = lbl_grounded_val.sprite.surface->h;
@@ -476,20 +497,20 @@ void Game_run(struct Game *game)
 		     x < game->wld_draw_pts[1].x; x++) {
 			for (int y = game->wld_draw_pts[0].y;
 			     y < game->wld_draw_pts[1].y; y++) {
-				temp.x = (x * BLOCK_SIZE) - game->camera.x;
-				temp.y = (y * BLOCK_SIZE) - game->camera.y;
-				temp.w = BLOCK_SIZE;
-				temp.h = BLOCK_SIZE;
+				temp_rect.x = (x * BLOCK_SIZE) - game->camera.x;
+				temp_rect.y = (y * BLOCK_SIZE) - game->camera.y;
+				temp_rect.w = BLOCK_SIZE;
+				temp_rect.h = BLOCK_SIZE;
 
 				SDL_RenderCopy(game->renderer,
 					       game->world.
 					       block_textures[x][y][1], NULL,
-					       &temp);
+					       &temp_rect);
 
 				SDL_RenderCopy(game->renderer,
 					       game->world.
 					       block_textures[x][y][0], NULL,
-					       &temp);
+					       &temp_rect);
 			}
 		}
 
@@ -503,13 +524,15 @@ void Game_run(struct Game *game)
 		}
 
 		// draw player
-		temp.x = player->rect.x - game->camera.x;
-		temp.y = player->rect.y - game->camera.y;
-		temp.w = player->rect.w;
-		temp.h = player->rect.h;
+		temp_rect.x = player->rect.x - game->camera.x;
+		temp_rect.y = player->rect.y - game->camera.y;
+		temp_rect.w = player->rect.w;
+		temp_rect.h = player->rect.h;
 
 		SDL_RenderCopy(game->renderer,
-			       game->spr_ents[E_PLAYER].texture, NULL, &temp);
+			       game->spr_ents[E_PLAYER].texture,
+			       NULL,
+			       &temp_rect);
 
 #ifdef _DEBUG
 		// draw debug menu
@@ -531,9 +554,10 @@ void Game_run(struct Game *game)
 
 void Game_edit(struct Game *game, const size_t width, const size_t height)
 {
+	const char *temp;
 	struct String filepath = String_new(8);
 	f32 edit_move_speed;
-	SDL_Rect temp;
+	SDL_Rect temp_rect;
 	u32 mouse_state;
 	SDL_Rect mouse_pos;
 	struct FPoint edit_pos = {
@@ -555,9 +579,10 @@ void Game_edit(struct Game *game, const size_t width, const size_t height)
 	if (get_world_path(&filepath) != 0)
 		return;
 
-	String_append_cstr(&filepath, game->world_name);
-	String_append_cstr(&filepath, ".");
-	String_append_cstr(&filepath, FILETYPE_WORLD);
+	String_append(&filepath, game->world_name, strlen(game->world_name));
+	temp = ".";
+	String_append(&filepath, temp, strlen(temp));
+	String_append(&filepath, FILETYPE_WORLD, strlen(FILETYPE_WORLD));
 
 	if (file_check_existence(filepath.str) == 0) {
 		game->world = Ch_World_new(width, height);
@@ -778,17 +803,17 @@ void Game_edit(struct Game *game, const size_t width, const size_t height)
 			     x < game->wld_draw_pts[1].x; x++) {
 				for (int y = game->wld_draw_pts[0].y;
 				     y < game->wld_draw_pts[1].y; y++) {
-					temp.x =
+					temp_rect.x =
 					    (x * BLOCK_SIZE) - game->camera.x;
-					temp.y =
+					temp_rect.y =
 					    (y * BLOCK_SIZE) - game->camera.y;
-					temp.w = BLOCK_SIZE;
-					temp.h = BLOCK_SIZE;
+					temp_rect.w = BLOCK_SIZE;
+					temp_rect.h = BLOCK_SIZE;
 
 					SDL_RenderCopy(game->renderer,
 						       game->world.
 						       block_textures[x][y][1],
-						       NULL, &temp);
+						       NULL, &temp_rect);
 				}
 			}
 		}
@@ -798,17 +823,17 @@ void Game_edit(struct Game *game, const size_t width, const size_t height)
 			     x < game->wld_draw_pts[1].x; x++) {
 				for (int y = game->wld_draw_pts[0].y;
 				     y < game->wld_draw_pts[1].y; y++) {
-					temp.x =
+					temp_rect.x =
 					    (x * BLOCK_SIZE) - game->camera.x;
-					temp.y =
+					temp_rect.y =
 					    (y * BLOCK_SIZE) - game->camera.y;
-					temp.w = BLOCK_SIZE;
-					temp.h = BLOCK_SIZE;
+					temp_rect.w = BLOCK_SIZE;
+					temp_rect.h = BLOCK_SIZE;
 
 					SDL_RenderCopy(game->renderer,
 						       game->world.
 						       block_textures[x][y][0],
-						       NULL, &temp);
+						       NULL, &temp_rect);
 				}
 			}
 		}
@@ -820,15 +845,15 @@ void Game_edit(struct Game *game, const size_t width, const size_t height)
 			     x < game->wld_draw_pts[1].x; x++) {
 				for (int y = game->wld_draw_pts[0].y;
 				     y < game->wld_draw_pts[1].y; y++) {
-					temp.x =
+					temp_rect.x =
 					    (x * BLOCK_SIZE) - game->camera.x;
-					temp.y =
+					temp_rect.y =
 					    (y * BLOCK_SIZE) - game->camera.y;
-					temp.w = BLOCK_SIZE;
-					temp.h = BLOCK_SIZE;
+					temp_rect.w = BLOCK_SIZE;
+					temp_rect.h = BLOCK_SIZE;
 
 					SDL_RenderDrawRect(game->renderer,
-							   &temp);
+							   &temp_rect);
 				}
 			}
 		}
@@ -848,30 +873,30 @@ void Game_edit(struct Game *game, const size_t width, const size_t height)
 				   game->camera.y);
 
 		// draw currently selected block (border)
-		temp.x = BLOCK_SIZE;
-		temp.y = 0;
-		temp.w = 2;
-		temp.h = BLOCK_SIZE + 2;
+		temp_rect.x = BLOCK_SIZE;
+		temp_rect.y = 0;
+		temp_rect.w = 2;
+		temp_rect.h = BLOCK_SIZE + 2;
 
 		SDL_SetRenderDrawColor(game->renderer, 255, 255, 0, 255);
-		SDL_RenderFillRect(game->renderer, &temp);
+		SDL_RenderFillRect(game->renderer, &temp_rect);
 
-		temp.x = 0;
-		temp.y = BLOCK_SIZE;
-		temp.w = BLOCK_SIZE + 2;
-		temp.h = 2;
+		temp_rect.x = 0;
+		temp_rect.y = BLOCK_SIZE;
+		temp_rect.w = BLOCK_SIZE + 2;
+		temp_rect.h = 2;
 
-		SDL_RenderFillRect(game->renderer, &temp);
+		SDL_RenderFillRect(game->renderer, &temp_rect);
 
 		// (block)
-		temp.x = 0;
-		temp.y = 0;
-		temp.w = BLOCK_SIZE;
-		temp.h = BLOCK_SIZE;
+		temp_rect.x = 0;
+		temp_rect.y = 0;
+		temp_rect.w = BLOCK_SIZE;
+		temp_rect.h = BLOCK_SIZE;
 
 		SDL_RenderCopy(game->renderer,
 			       game->spr_blocks[edit_block].texture,
-			       NULL, &temp);
+			       NULL, &temp_rect);
 
 		// show drawn image
 		SDL_RenderPresent(game->renderer);

@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "dict.h"
 
@@ -102,9 +103,9 @@ struct Dict Dict_from_file(const char *filepath)
 		default:
 			// append character to key or value
 			if (read_key == 1)
-				String_append_cstr(&key, buf);
+				String_append(&key, buf, strlen(buf));
 			else
-				String_append_cstr(&value, buf);
+				String_append(&value, buf, strlen(buf));
 		}
 	}
 

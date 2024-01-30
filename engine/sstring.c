@@ -39,82 +39,61 @@ void String_ensure_size(struct String *str, usize size)
 
 struct String String_new(const usize inital_size)
 {
-	struct String result = {
+	struct String ret = {
+		.size = inital_size,
 		.len = 0,
-		.str = malloc(inital_size),
-		.size = inital_size
+		.str = malloc(inital_size)
 	};
-
-	return result;
+	
+	ret.str[0] = '\0';
+	
+	return ret;
 }
 
 struct String String_from(const char *cstr)
 {
-	struct String result = String_new(STRING_IMPLICIT_INITIAL_SIZE);
-	const size_t cstrlen = strlen(cstr);
+	struct String ret = String_new(STRING_IMPLICIT_INITIAL_SIZE);
 
-	struct String temp = {
-		.str = (char *)cstr,
-		.len = cstrlen - 1,
-		.size = cstrlen
-	};
+	String_copy(&ret, cstr, strlen(cstr));
 
-	String_copy(&result, &temp);
-
-	return result;
+	return ret;
 }
 
 struct String String_contain(const char *cstr)
 {
 	const size_t cstrlen = strlen(cstr);
-	const struct String result = {
+	const struct String ret = {
 		.len = cstrlen - 1,
 		.size = 0,
 		.str = (char *)cstr
 	};
 
-	return result;
-}
-
-void String_copy(struct String *restrict dest, struct String *restrict src)
-{
-	String_ensure_size(dest, src->len + 1);
-
-	strncpy(dest->str, src->str, src->len + 1);
-
-	dest->len = src->len;
+	return ret;
 }
 
 void
-String_append(struct String *restrict dest,
-              struct String *restrict addendum)
+String_copy(struct String       *string,
+            const char          *src,
+            const long unsigned  src_len)
 {
-	String_ensure_size(dest, dest->len + addendum->len + 1);
-
-	strncpy(&dest->str[dest->len], addendum->str, addendum->len + 1);
-
-	dest->len += addendum->len;
+	string->len = 0;
+	String_append(string, src, src_len);
 }
 
-void String_copy_cstr(struct String *restrict dest, const char *restrict src)
+void
+String_append(struct String       *string,
+              const char          *src,
+              const long unsigned  src_len)
 {
-	const usize src_len = strlen(src);
-	String_ensure_size(dest, src_len);
-
-	strncpy(dest->str, src, src_len);
-
-	dest->len = src_len - 1;
-}
-
-void String_append_cstr(struct String *restrict dest,
-			   const char *restrict addendum)
-{
-	const usize add_len = strlen(addendum);
-	String_ensure_size(dest, dest->len + add_len);
-
-	strncpy(&dest->str[dest->len], addendum, add_len);
-
-	dest->len += add_len - 1;
+	const long unsigned new_len = src_len + string->len;
+	
+	while ((new_len + 1) > string->size) {
+		String_grow(string);
+	}
+	
+	strncpy(&string->str[string->len], src, src_len);
+	string->len = new_len;
+	string->str[string->len] = '\0';
 }
 
 int

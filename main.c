@@ -322,6 +322,7 @@ void gen_demo_horizontal(void)
 
 int main()
 {
+	const char *temp;
 	struct String window_title = String_new(64);
 	struct String msg = String_new(16);
 	SDL_Window *window;
@@ -425,11 +426,11 @@ int main()
 		FONT_SIZE);
 
 	// create window title
-	String_copy_cstr(&window_title, APP_NAME);
-	String_append_cstr(&window_title, ": ");
-	String_append_cstr(&window_title,
-			      MOTDS[rand() %
-				    (sizeof(MOTDS) / sizeof(MOTDS[0]))]);
+	String_copy(&window_title, APP_NAME, strlen(APP_NAME));
+	temp = ": ";
+	String_append(&window_title, temp, strlen(temp));
+	temp = MOTDS[rand() % (sizeof(MOTDS) / sizeof(MOTDS[0]))];
+	String_append(&window_title, temp, strlen(temp));
 
 	// create window and renderer
 	window = SDL_CreateWindow(window_title.str,
@@ -516,14 +517,14 @@ int main()
 	mnu_master.rect.w = cfg.gfx_window_w;
 	mnu_master.rect.h = cfg.gfx_window_h;
 
-	String_copy_cstr(&lbl_app_name.text, APP_NAME);
+	String_copy(&lbl_app_name.text, APP_NAME, strlen(APP_NAME));
 	Label_update_sprite(&lbl_app_name);
 	lbl_app_name.rect.w = lbl_app_name.sprite.surface->w;
 	lbl_app_name.rect.h = lbl_app_name.sprite.surface->h;
 	lbl_app_name.rect.x = 25;
 	lbl_app_name.rect.y = 150;
 
-	String_append_cstr(&btn_version.text, APP_VERSION);
+	String_append(&btn_version.text, APP_VERSION, strlen(APP_VERSION));
 	Button_update_sprite(&btn_version);
 	btn_version.rect.w = btn_version.sprite.surface->w;
 	btn_version.rect.h = btn_version.sprite.surface->h;
@@ -538,7 +539,8 @@ int main()
 	mnu_main.rect.w = 0;
 	mnu_main.rect.h = 0;
 
-	String_copy_cstr(&btn_start_game.text, "Start game ->");
+	temp = "Start game ->";
+	String_copy(&btn_start_game.text, temp, strlen(temp));
 	Button_update_sprite(&btn_start_game);
 	btn_start_game.rect.w = btn_start_game.sprite.surface->w;
 	btn_start_game.rect.h = btn_start_game.sprite.surface->h;
@@ -547,7 +549,8 @@ int main()
 	btn_start_game.func_click = btn_start_game_click;
 	btn_start_game.data_click = &menu_data;
 
-	String_copy_cstr(&btn_editor.text, "Editor ->");
+	temp = "Editor ->";
+	String_copy(&btn_editor.text, temp, strlen(temp));
 	Button_update_sprite(&btn_editor);
 	btn_editor.rect.w = btn_editor.sprite.surface->w;
 	btn_editor.rect.h = btn_editor.sprite.surface->h;
@@ -556,7 +559,8 @@ int main()
 	btn_editor.func_click = btn_editor_click;
 	btn_editor.data_click = &menu_data;
 
-	String_copy_cstr(&btn_settings.text, "Settings ->");
+	temp = "Settings ->";
+	String_copy(&btn_settings.text, temp, strlen(temp));
 	Button_update_sprite(&btn_settings);
 	btn_settings.rect.w = btn_settings.sprite.surface->w;
 	btn_settings.rect.h = btn_settings.sprite.surface->h;
@@ -565,7 +569,8 @@ int main()
 	btn_settings.func_click = btn_settings_click;
 	btn_settings.data_click = &btn_settings_data;
 
-	String_copy_cstr(&btn_exit.text, "Exit");
+	temp = "Exit";
+	String_copy(&btn_exit.text, temp, strlen(temp));
 	Button_update_sprite(&btn_exit);
 	btn_exit.rect.w = btn_exit.sprite.surface->w;
 	btn_exit.rect.h = btn_exit.sprite.surface->h;
@@ -581,7 +586,8 @@ int main()
 	mnu_start_game.rect.h = 0;
 	mnu_start_game.visible = 0;
 
-	String_copy_cstr(&btn_start_game_close.text, "<- Main");
+	temp = "<- Main";
+	String_copy(&btn_start_game_close.text, temp, strlen(temp));
 	Button_update_sprite(&btn_start_game_close);
 	btn_start_game_close.rect.w = btn_start_game_close.sprite.surface->w;
 	btn_start_game_close.rect.h = btn_start_game_close.sprite.surface->h;
@@ -590,7 +596,8 @@ int main()
 	btn_start_game_close.func_click = btn_start_game_close_click;
 	btn_start_game_close.data_click = &menu_data;
 
-	String_copy_cstr(&btn_chapter1.text, "Chapter 1: Test");
+	temp = "Chapter 1: Test";
+	String_copy(&btn_chapter1.text, temp, strlen(temp));
 	Button_update_sprite(&btn_chapter1);
 	btn_chapter1.rect.w = btn_chapter1.sprite.surface->w;
 	btn_chapter1.rect.h = btn_chapter1.sprite.surface->h;
@@ -607,7 +614,8 @@ int main()
 	mnu_editor.rect.h = 0;
 	mnu_editor.visible = 0;
 
-	String_copy_cstr(&btn_editor_close.text, "<- Main");
+	temp = "<- Main";
+	String_copy(&btn_editor_close.text, temp, strlen(temp));
 	Button_update_sprite(&btn_editor_close);
 	btn_editor_close.rect.w = btn_editor_close.sprite.surface->w;
 	btn_editor_close.rect.h = btn_editor_close.sprite.surface->h;
@@ -616,7 +624,8 @@ int main()
 	btn_editor_close.func_click = btn_editor_close_click;
 	btn_editor_close.data_click = &menu_data;
 
-	String_copy_cstr(&lbl_edit_name.text, "Name:");
+	temp = "Name:";
+	String_copy(&lbl_edit_name.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_edit_name);
 	lbl_edit_name.rect.w = lbl_edit_name.sprite.surface->w;
 	lbl_edit_name.rect.h = lbl_edit_name.sprite.surface->h;
@@ -629,7 +638,8 @@ int main()
 	txt_edit_name.rect.x = lbl_edit_name.rect.x + lbl_edit_name.rect.w;
 	txt_edit_name.rect.y = lbl_edit_name.rect.y;
 
-	String_copy_cstr(&lbl_edit_width.text, "Width:");
+	temp = "Width:";
+	String_copy(&lbl_edit_width.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_edit_width);
 	lbl_edit_width.rect.w = lbl_edit_width.sprite.surface->w;
 	lbl_edit_width.rect.h = lbl_edit_width.sprite.surface->h;
@@ -641,7 +651,8 @@ int main()
 	txt_edit_width.rect.x = lbl_edit_width.rect.x + lbl_edit_width.rect.w;
 	txt_edit_width.rect.y = lbl_edit_width.rect.y;
 
-	String_copy_cstr(&lbl_edit_height.text, "Height:");
+	temp = "Height:";
+	String_copy(&lbl_edit_height.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_edit_height);
 	lbl_edit_height.rect.w = lbl_edit_height.sprite.surface->w;
 	lbl_edit_height.rect.h = lbl_edit_height.sprite.surface->h;
@@ -654,7 +665,8 @@ int main()
 	    lbl_edit_height.rect.x + lbl_edit_height.rect.w;
 	txt_edit_height.rect.y = lbl_edit_height.rect.y;
 
-	String_copy_cstr(&btn_start_edit.text, "Start");
+	temp = "Start";
+	String_copy(&btn_start_edit.text, temp, strlen(temp));
 	Button_update_sprite(&btn_start_edit);
 	btn_start_edit.rect.w = btn_start_edit.sprite.surface->w;
 	btn_start_edit.rect.h = btn_start_edit.sprite.surface->h;
@@ -670,7 +682,8 @@ int main()
 	mnu_settings.rect.h = 0;
 	mnu_settings.visible = 0;
 
-	String_copy_cstr(&btn_settings_close.text, "<- Main");
+	temp = "<- Main";
+	String_copy(&btn_settings_close.text, temp, strlen(temp));
 	Button_update_sprite(&btn_settings_close);
 	btn_settings_close.rect.w = btn_settings_close.sprite.surface->w;
 	btn_settings_close.rect.h = btn_settings_close.sprite.surface->h;
@@ -679,7 +692,8 @@ int main()
 	btn_settings_close.func_click = btn_settings_close_click;
 	btn_settings_close.data_click = &btn_settings_data;
 
-	String_copy_cstr(&lbl_gfx_window_w.text, "Resolution X:");
+	temp = "Resolution X:";
+	String_copy(&lbl_gfx_window_w.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_gfx_window_w);
 	lbl_gfx_window_w.rect.w = lbl_gfx_window_w.sprite.surface->w;
 	lbl_gfx_window_w.rect.h = lbl_gfx_window_w.sprite.surface->h;
@@ -693,7 +707,8 @@ int main()
 	    lbl_gfx_window_w.rect.x + lbl_gfx_window_w.rect.w;
 	txt_gfx_window_w.rect.y = lbl_gfx_window_w.rect.y;
 
-	String_copy_cstr(&lbl_gfx_window_h.text, "Resolution Y:");
+	temp = "Resolution Y:";
+	String_copy(&lbl_gfx_window_h.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_gfx_window_h);
 	lbl_gfx_window_h.rect.w = lbl_gfx_window_h.sprite.surface->w;
 	lbl_gfx_window_h.rect.h = lbl_gfx_window_h.sprite.surface->h;
@@ -707,7 +722,8 @@ int main()
 	    lbl_gfx_window_h.rect.x + lbl_gfx_window_h.rect.w;
 	txt_gfx_window_h.rect.y = lbl_gfx_window_h.rect.y;
 
-	String_copy_cstr(&lbl_gfx_window_fullscreen.text, "Fullscreen:");
+	temp = "Fullscreen:";
+	String_copy(&lbl_gfx_window_fullscreen.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_gfx_window_fullscreen);
 	lbl_gfx_window_fullscreen.rect.w = lbl_gfx_window_h.sprite.surface->w;
 	lbl_gfx_window_fullscreen.rect.h = lbl_gfx_window_h.sprite.surface->h;
@@ -728,7 +744,8 @@ int main()
 	mnu_license.rect.h = 0;
 	mnu_license.visible = 0;
 
-	String_copy_cstr(&btn_license_close.text, "<- Main");
+	temp = "<- Main";
+	String_copy(&btn_license_close.text, temp, strlen(temp));
 	Button_update_sprite(&btn_license_close);
 	btn_license_close.rect.w = btn_license_close.sprite.surface->w;
 	btn_license_close.rect.h = btn_license_close.sprite.surface->h;
@@ -737,10 +754,11 @@ int main()
 	btn_license_close.func_click = btn_license_close_click;
 	btn_license_close.data_click = &menu_data;
 
-	String_copy_cstr(&lbl_license.text, APP_NAME);
-	String_append_cstr(&lbl_license.text, APP_VERSION);
-	String_append_cstr(&lbl_license.text, " is licensed under the ");
-	String_append_cstr(&lbl_license.text, APP_LICENSE);
+	String_copy(&lbl_license.text, APP_NAME, strlen(APP_NAME));
+	String_append(&lbl_license.text, APP_VERSION, strlen(APP_VERSION));
+	temp = " is licensed under the ";
+	String_append(&lbl_license.text, temp, strlen(temp));
+	String_append(&lbl_license.text, APP_LICENSE, strlen(APP_LICENSE));
 	lbl_license.text.len = strlen(btn_license_close.text.str) - 1;
 	Label_update_sprite(&lbl_license);
 	lbl_license.rect.w = lbl_license.sprite.surface->w;
@@ -749,29 +767,33 @@ int main()
 	lbl_license.rect.y =
 	    btn_license_close.rect.y + btn_license_close.rect.h;
 
-	String_copy_cstr(&lbl_notice1.text, APP_LICENSE_SOURCE1);
+	String_copy(&lbl_notice1.text,
+	            APP_LICENSE_SOURCE1,
+	            strlen(APP_LICENSE_SOURCE1));
 	Label_update_sprite(&lbl_notice1);
 	lbl_notice1.rect.w = lbl_notice1.sprite.surface->w;
 	lbl_notice1.rect.h = lbl_notice1.sprite.surface->h;
 	lbl_notice1.rect.x = mnu_license.rect.x;
 	lbl_notice1.rect.y = lbl_license.rect.y + lbl_license.rect.h;
 
-	String_copy_cstr(&lbl_notice2.text, APP_LICENSE_SOURCE2);
+	String_copy(&lbl_notice2.text,
+	            APP_LICENSE_SOURCE2,
+	            strlen(APP_LICENSE_SOURCE2));
 	Label_update_sprite(&lbl_notice2);
 	lbl_notice2.rect.w = lbl_notice2.sprite.surface->w;
 	lbl_notice2.rect.h = lbl_notice2.sprite.surface->h;
 	lbl_notice2.rect.x = mnu_license.rect.x;
 	lbl_notice2.rect.y = lbl_notice1.rect.y + lbl_notice1.rect.h;
 
-	String_copy_cstr(&lbl_source1.text,
-			    "The source code of this program is available at");
+	temp = "The source code of this program is available at";
+	String_copy(&lbl_source1.text, temp, strlen(temp));
 	Label_update_sprite(&lbl_source1);
 	lbl_source1.rect.w = lbl_source1.sprite.surface->w;
 	lbl_source1.rect.h = lbl_source1.sprite.surface->h;
 	lbl_source1.rect.x = mnu_license.rect.x;
 	lbl_source1.rect.y = lbl_notice2.rect.y + lbl_notice2.rect.h;
 
-	String_copy_cstr(&lbl_source2.text, APP_SOURCE);
+	String_copy(&lbl_source2.text, APP_SOURCE, strlen(APP_SOURCE));
 	Label_update_sprite(&lbl_source2);
 	lbl_source2.rect.w = lbl_source2.sprite.surface->w;
 	lbl_source2.rect.h = lbl_source2.sprite.surface->h;

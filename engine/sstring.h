@@ -25,17 +25,15 @@ struct String String_from(const char *cstr);
 
 struct String String_contain(const char *cstr);
 
-void String_copy(struct String *restrict dest, struct String *restrict src);
+void
+String_copy(struct String       *string,
+            const char          *src,
+            const long unsigned  src_len);
 
 void
-String_append(struct String *restrict dest,
-              struct String *restrict addendum);
-
-void String_copy_cstr(struct String *restrict dest, const char *restrict src);
-
-void
-String_append_cstr(struct String *restrict dest,
-                   const char *restrict addendum);
+String_append(struct String       *string,
+              const char          *src,
+              const long unsigned  src_len);
 
 int
 String_equal(const struct String *restrict a,

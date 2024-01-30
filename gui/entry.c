@@ -63,7 +63,7 @@ void Entry_append(struct Entry *entry, struct String *appendage)
 	size_t new_size;
 	size_t i;
 
-	String_append(&entry->text, appendage);
+	String_append(&entry->text, appendage->str, appendage->len);
 
 	// increase sprite array size
 	if (entry->text.size > old_size) {

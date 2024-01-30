@@ -23,6 +23,7 @@ struct Config Config_new(void)
 
 void Config_from_file(struct Config *cfg)
 {
+	const char *temp;
 	struct String filepath = String_new(16);
 	struct String msg = String_new(1);
 
@@ -71,9 +72,13 @@ void Config_from_file(struct Config *cfg)
 
 		// unknown option
 		else {
-			String_copy_cstr(&msg, "Unknown config setting \"");
-			String_append(&msg, &dict.data[i].key);
-			String_append_cstr(&msg, "\".");
+			temp = "Unknown config setting \"";
+			String_copy(&msg, temp, strlen(temp));
+			String_append(&msg,
+			              dict.data[i].key.str,
+			              dict.data[i].key.len);
+			temp = "\".";
+			String_append(&msg, temp, strlen(temp));
 			log_warn(msg.str);
 		}
 	}

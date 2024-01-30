@@ -29,6 +29,7 @@ struct World Ch_World_new(const size_t width, const size_t height)
 
 struct World Ch_World_from_file(const char *world_name)
 {
+	const char *temp;
 	struct World world;
 	struct String filepath = String_new(8);
 
@@ -38,18 +39,21 @@ struct World Ch_World_from_file(const char *world_name)
 		return world;
 	}
 
-	String_append_cstr(&filepath, world_name);
-	String_append_cstr(&filepath, ".");
-	String_append_cstr(&filepath, FILETYPE_WORLD);
+	String_append(&filepath, world_name, strlen(world_name));
+	temp = ".";
+	String_append(&filepath, temp, strlen(temp));
+	String_append(&filepath, FILETYPE_WORLD, strlen(FILETYPE_WORLD));
 
 	// read
 	world = World_from_file(filepath.str);
 
 	if (world.invalid) {
 		struct String msg = String_new(16);
-		String_copy_cstr(&msg, "World \"");
-		String_append_cstr(&msg, world_name);
-		String_append_cstr(&msg, "\" could not be read.");
+		temp = "World \"";
+		String_copy(&msg, temp, strlen(temp));
+		String_append(&msg, world_name, strlen(world_name));
+		temp = "\" could not be read.";
+		String_append(&msg, temp, strlen(temp));
 		log_err(msg.str);
 		String_clear(&msg);
 	}
@@ -60,6 +64,7 @@ struct World Ch_World_from_file(const char *world_name)
 
 void Ch_World_to_file(struct World *world, const char *world_name)
 {
+	const char *temp;
 	struct String filepath = String_new(8);
 
 	// get path
@@ -68,18 +73,21 @@ void Ch_World_to_file(struct World *world, const char *world_name)
 		return;
 	}
 
-	String_append_cstr(&filepath, world_name);
-	String_append_cstr(&filepath, ".");
-	String_append_cstr(&filepath, FILETYPE_WORLD);
+	String_append(&filepath, world_name, strlen(world_name));
+	temp = ".";
+	String_append(&filepath, temp, strlen(temp));
+	String_append(&filepath, FILETYPE_WORLD, strlen(FILETYPE_WORLD));
 
 	// write
 	Ch_World_to_file(world, filepath.str);
 
 	if (world->invalid) {
 		struct String msg = String_new(16);
-		String_copy_cstr(&msg, "World \"");
-		String_append_cstr(&msg, world_name);
-		String_append_cstr(&msg, "\" could not be read.");
+		temp = "World \"";
+		String_copy(&msg, temp, strlen(temp));
+		String_append(&msg, world_name, strlen(world_name));
+		temp = "\" could not be read.";
+		String_append(&msg, temp, strlen(temp));
 		log_err(msg.str);
 		String_clear(&msg);
 	}

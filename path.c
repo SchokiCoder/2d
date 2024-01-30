@@ -14,13 +14,16 @@
 i32 get_base_path(struct String *out)
 {
 	i32 ret;
+	const char *temp;
 
 	// get path
-	String_append_cstr(out, getenv("HOME"));
-	String_append_cstr(out, SLASH);
-	String_append_cstr(out, ".");
-	String_append_cstr(out, APP_NAME);
-	String_append_cstr(out, SLASH);
+	temp = getenv("HOME");
+	String_append(out, temp, strlen(temp));
+	String_append(out, SLASH, strlen(SLASH));
+	temp = ".";
+	String_append(out, temp, strlen(temp));
+	String_append(out, APP_NAME, strlen(APP_NAME));
+	String_append(out, SLASH, strlen(SLASH));
 
 	/* in case, create dir */
 	errno = 0;
@@ -52,8 +55,8 @@ i32 get_world_path(struct String *out)
 		return ret;
 
 	/* get path */
-	String_append_cstr(out, PATH_WORLDS);
-	String_append_cstr(out, SLASH);
+	String_append(out, PATH_WORLDS, strlen(PATH_WORLDS));
+	String_append(out, SLASH, strlen(SLASH));
 
 	/* in case, create dir */
 	errno = 0;
@@ -85,7 +88,7 @@ i32 get_config_path(struct String *out)
 		return ret;
 
 	/* get path */
-	String_append_cstr(out, PATH_CONFIG);
+	String_append(out, PATH_CONFIG, strlen(PATH_CONFIG));
 
 	return 0;
 }

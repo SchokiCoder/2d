@@ -446,7 +446,7 @@ int main()
 	}
 	// game data
 	struct Game game = {
-		.world_name = "test",
+		.world_name = "worlds/test",
 		.renderer = renderer,
 		.cfg = &cfg,
 	};

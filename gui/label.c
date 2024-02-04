@@ -26,9 +26,9 @@ void Label_update_sprite(struct Label *label)
 {
 	Sprite_clear(&label->sprite);
 	label->sprite = Sprite_from_text(label->menu->renderer,
-					      label->text.str,
-					      label->font,
-					      label->style.font_color);
+	                                 label->text.str,
+	                      	         label->font,
+	                                 label->style.font_color);
 }
 
 void Label_draw(struct Label *label)

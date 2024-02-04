@@ -91,13 +91,7 @@ void Game_setup(struct Game *game)
 	game->world = World_from_file(game->world_name);
 
 	if (game->world.invalid) {
-		temp = "World ";
-		String_copy(&game->msg, temp, strlen(temp));
-		String_append(&game->msg,
-		              game->world_name,
-		              strlen(game->world_name));
-		temp = "is not valid.";
-		String_append(&game->msg, temp, strlen(temp));
+		fprintf(stderr, "World %s is invalid\n", game->world_name);
 		Game_clear(game);
 		return;
 	}

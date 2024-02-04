@@ -59,6 +59,7 @@ struct World World_from_file(const char *filepath)
 	f = fopen(filepath, "r");
 
 	if (f == NULL) {
+		fprintf(stderr, "World file \"%s\" not found\n", filepath);
 		world.invalid = 1;
 		return world;
 	}

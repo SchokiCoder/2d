@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (C) 2023  Andy Frank Schoknecht
 
-APP_NAME=generic2d
+APP_NAME=2d
 APP_VERSION=0.0.0
 APP_LICENSE=GPL-2.0-or-later
 APP_LICENSE_SOURCE1=You should have received a copy of the GNU General Public License along with this program;
@@ -10,6 +10,7 @@ APP_SOURCE=https://github.com/SchokiCoder/generic2d
 
 BIN_DIR=$(HOME)/.local/bin
 TEXTURES_DIR=$(HOME)/.local/share/$(APP_NAME)/textures
+WORLDS_DIR=$(HOME)/.local/share/$(APP_NAME)/worlds
 
 DEFINES=-D PATH_TEXTURES="\"$(TEXTURES_DIR)/\"" \
 	-D APP_NAME="\"$(APP_NAME)\"" \
@@ -24,7 +25,7 @@ INCLUDE=-I . -I /usr/include/SDL2
 LIBS=-l SDL2 -l SDL2_ttf
 CFLAGS=-std=c99 -Wall -Wextra $(INCLUDE) $(LIBS) $(DEFINES)
 REL_CFLAGS=$(CFLAGS) -Os
-DEB_CFLAGS=$(CFLAGS) -g -D _DEBUG -fsanitize=address,undefined
+DEB_CFLAGS=$(CFLAGS) -g -D _DEBUG #-fsanitize=address,undefined
 
 TARGETS_GUI=gui/sprite.o \
 	gui/entry.o \
@@ -42,12 +43,14 @@ TARGETS=$(TARGETS_ENGINE) $(TARGETS_GUI) \
 	world.o path.o main.o game.o entity.o config.o
 
 # compiles every module itself
-generic2d: *.c engine/*.c gui/*.c
+2d: *.c engine/*.c gui/*.c
 	$(CC) $(REL_CFLAGS) -o $@ $^
 
-# this is built more often, so it gets the speed improvement
-generic2d_d: $(TARGETS)
+2d_d: *.c engine/*.c gui/*.c
 	$(CC) $(DEB_CFLAGS) -o $@ $^
+
+#2d_d: $(TARGETS)
+#	$(CC) $(DEB_CFLAGS) -o $@ $^
 
 config.o: config.c config.h
 	$(CC) $(DEB_CFLAGS) -c -o $@ $<

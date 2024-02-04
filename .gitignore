@@ -2,7 +2,9 @@
 gui/*.o
 engine/*.o
 generic2d
+2d
 generic2d_d
+2d_d
 chemarium
 chemarium_d
 log.txt

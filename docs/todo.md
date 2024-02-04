@@ -25,7 +25,7 @@ Each pixel is a block.
   Where supposed to be removed long ago.
 - fix all mem issues
 	+ fix string yank
-	- main.c:522 sigsegv sdl surface
+	- log_err uses va_list and prints to log and stderr
 - consider zig cc
 - unused variable warnings
   (most likely because of -c flag oriented compilation)
